@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat | Tattva Nexus</title>
+    <style>
+        /* Global Variables */
+        :root {
+            --primary-accent: #1e3a8a; 
+            --secondary-accent: #3b82f6;
+            --whatsapp-bg: #efeae2;
+            --header-bg: #ffffff;
+            --text-main: #111b21;
+            --text-muted: #667781;
+            --sent-bubble: #1e3a8a; /* Requirement: Blue bubble */
+            --received-bubble: #ffffff;
+            --border-color: #d1d7db;
+            --tick-gray: rgba(255, 255, 255, 0.6);
+            --tick-blue: #4fc3f7; 
+        }
+
+        /* Reset & Base */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--whatsapp-bg);
+            /* WhatsApp Tiled Background */
+            background-image: url("https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png");
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Sticky Header */
+        .chat-header {
+            height: 65px;
+            background-color: var(--header-bg);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 1.5rem;
+            flex-shrink: 0;
+            z-index: 100;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn-back {
+            text-decoration: none;
+            color: var(--primary-accent);
+            font-size: 1.5rem;
+            margin-right: 5px;
+            font-weight: bold;
+        }
+
+        .recipient-avatar {
+            width: 40px;
+            height: 40px;
+            background-color: var(--primary-accent);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            font-size: 1rem;
+            text-transform: uppercase;
+        }
+
+        .recipient-name {
+            font-weight: 600;
+            font-size: 1rem;
+            color: var(--text-main);
+        }
+
+        /* Top Right User Profile */
+        .top-right-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .brand-text {
+            font-size: 0.7rem; 
+            color: var(--text-muted); 
+            font-weight: 800; 
+            letter-spacing: 1px;
+            margin-right: 5px;
+        }
+
+        .current-user-name {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-main);
+            display: none;
+        }
+
+        .current-user-avatar {
+            width: 32px;
+            height: 32px;
+            background-color: var(--secondary-accent);
+            color: white;
+            border-radius: 50%;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+        }
+
+        /* PRIME STANDARD 3: DUAL-VIEW FILTER LOGIC */
+        .filter-bar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            background-color: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(5px);
+            border-bottom: 1px solid var(--border-color);
+            gap: 10px;
+            z-index: 90;
+        }
+
+        .filter-btn {
+            padding: 6px 16px;
+            border: 1px solid var(--primary-accent);
+            border-radius: 20px;
+            background-color: white;
+            color: var(--primary-accent);
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-btn.active {
+            background-color: var(--primary-accent);
+            color: white;
+        }
+
+        /* Message Container */
+        #chatMessages {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 1.5rem 7%; 
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            scroll-behavior: smooth;
+        }
+
+        /* Message Bubbles Logic */
+        .message {
+            max-width: 65%;
+            padding: 8px 12px 6px 12px;
+            font-size: 0.95rem;
+            line-height: 1.4;
+            position: relative;
+            word-wrap: break-word;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.15);
+        }
+
+        .message img {
+            max-width: 100%;
+            border-radius: 6px;
+            margin-bottom: 6px;
+            max-height: 250px;
+            object-fit: cover;
+        }
+
+        /* Requirement: Sent bubble blue, right side */
+        .message-sent {
+            align-self: flex-end;
+            background-color: var(--sent-bubble);
+            color: white;
+            border-radius: 12px 0px 12px 12px;
+        }
+
+        /* Requirement: Received bubble white/gray, left side */
+        .message-received {
+            align-self: flex-start;
+            background-color: var(--received-bubble);
+            color: var(--text-main);
+            border-radius: 0px 12px 12px 12px;
+        }
+
+        .author-name {
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .message-received .author-name { color: var(--secondary-accent); }
+        .message-sent .author-name { color: #a5b4fc; }
+
+        .msg-meta {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            margin-top: 4px;
+            gap: 4px;
+        }
+
+        .msg-time {
+            font-size: 0.7rem;
+            opacity: 0.8;
+        }
+        
+        .message-received .msg-time { color: var(--text-muted); }
+
+        /* Floating Bottom Input Area */
+        .chat-input-area {
+            background-color: #f0f2f5;
+            padding: 10px 2rem;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-shrink: 0;
+            border-top: 1px solid var(--border-color);
+            z-index: 90;
+        }
+
+        .btn-attach {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-muted);
+            transition: color 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-attach:hover {
+            color: var(--primary-accent);
+        }
+
+        .input-wrapper {
+            flex-grow: 1;
+            background: white;
+            border-radius: 20px;
+            padding: 2px 18px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 1px 1px rgba(0,0,0,0.1);
+        }
+
+        .chat-input-area input {
+            width: 100%;
+            padding: 12px 0;
+            border: none;
+            outline: none;
+            font-size: 0.95rem;
+            background: transparent;
+        }
+
+        .btn-send {
+            background-color: var(--primary-accent);
+            color: white;
+            border: none;
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: transform 0.2s;
+        }
+
+        .btn-send:hover { transform: scale(1.05); background-color: var(--secondary-accent); }
+
+        /* Fallback Overlay */
+        #fallbackUI, #selfWarningUI {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            text-align: center;
+            padding: 2rem;
+            background: white;
+            position: absolute;
+            top: 65px; left: 0; right: 0; bottom: 0;
+            z-index: 200;
+        }
+
+        .btn-return {
+            margin-top: 1.5rem;
+            background: var(--primary-accent);
+            color: white;
+            padding: 0.7rem 1.8rem;
+            border-radius: 20px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        #chatMessages::-webkit-scrollbar { width: 5px; }
+        #chatMessages::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 10px; }
+
+        /* PRIME STANDARD 1: HARDCORE CSS MODAL ALIGNMENT */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(8px);
+            z-index: 9998;
+            display: none;
+        }
+
+        .add-entry-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 9999;
+            background: #fff;
+            max-height: 90vh;
+            overflow-y: auto;
+            display: none;
+            width: 90%;
+            max-width: 400px;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+        }
+
+        .add-entry-modal h3 {
+            margin-bottom: 1.5rem;
+            color: var(--primary-accent);
+            text-align: center;
+        }
+
+        .add-entry-modal input[type="text"],
+        .add-entry-modal input[type="file"] {
+            width: 100%;
+            padding: 0.85rem;
+            margin-bottom: 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            outline: none;
+        }
+
+        .add-entry-modal button.submit-btn {
+            width: 100%;
+            padding: 0.875rem;
+            background-color: var(--primary-accent);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-top: 0.5rem;
+        }
+
+        .add-entry-modal button.submit-btn:hover {
+            background-color: var(--secondary-accent);
+        }
+        
+        .add-entry-modal button.submit-btn:disabled {
+            background-color: var(--text-muted);
+            cursor: not-allowed;
+        }
+
+        .close-modal-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--text-muted);
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            cursor: pointer;
+        }
+
+        @media (max-width: 600px) {
+            #chatMessages { padding: 1rem 5%; }
+            .message { max-width: 85%; }
+            .chat-input-area { padding: 10px 1rem; }
+            .brand-text { display: none; }
+            .current-user-name { display: none !important; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="chat-header">
+        <div class="user-info">
+            <a href="messages.html" class="btn-back">‹</a>
+            <div class="recipient-avatar" id="avatarIcon">?</div>
+            <div class="recipient-name" id="chattingWith">Loading...</div>
+        </div>
+        
+        <div class="top-right-user">
+            <div class="brand-text">TATTVA NEXUS</div>
+            <span class="current-user-name" id="topRightName"></span>
+            <div class="current-user-avatar" id="topRightAvatar"></div>
+        </div>
+    </header>
+
+    <!-- PRIME STANDARD 3: DUAL-VIEW FILTER LOGIC -->
+    <div class="filter-bar">
+        <button class="filter-btn active" id="btnAllItems">All Messages</button>
+        <button class="filter-btn" id="btnMyItems">My Messages</button>
+    </div>
+
+    <!-- Message Container -->
+    <main id="chatMessages">
+        <div style="text-align: center; color: var(--text-muted); margin-top: 2rem;">Loading chat securely...</div>
+    </main>
+
+    <!-- Fallback UI -->
+    <div id="fallbackUI">
+        <div style="font-size: 4rem; margin-bottom: 10px;">💬</div>
+        <h2 style="color: var(--text-main);">No Chat Selected</h2>
+        <p style="color: var(--text-muted);">Please select a contact from your inbox to start a conversation.</p>
+        <a href="messages.html" class="btn-return">Back to Inbox</a>
+    </div>
+
+    <!-- Self-Messaging Warning -->
+    <div id="selfWarningUI">
+        <div style="font-size: 4rem; margin-bottom: 10px;">🚫</div>
+        <h2 style="color: var(--text-main);">Self-Messaging Disabled</h2>
+        <p style="color: var(--text-muted);">You cannot start a conversation with yourself.</p>
+        <a href="messages.html" class="btn-return">Go to Inbox</a>
+    </div>
+
+    <!-- Bottom Input Area -->
+    <div class="chat-input-area">
+        <button type="button" class="btn-attach" id="btnOpenModal" title="Attach Media">📎</button>
+        <form id="chatForm" style="display: flex; flex-grow: 1; gap: 12px; margin: 0;">
+            <div class="input-wrapper">
+                <input type="text" id="messageInput" placeholder="Type a message..." autocomplete="off" required>
+            </div>
+            <button type="submit" class="btn-send">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="white">
+                    <path d="M1.101 21.757L23.8 12.028 1.101 2.3l.011 7.912 13.623 1.816-13.623 1.817-.011 7.912z"></path>
+                </svg>
+            </button>
+        </form>
+    </div>
+
+    <!-- PRIME STANDARD 1: HARDCORE CSS MODAL -->
+    <div class="modal-overlay" id="modalOverlay"></div>
+    <div class="add-entry-modal" id="addEntryModal">
+        <button class="close-modal-btn" id="btnCloseModal">&times;</button>
+        <h3>Send Attachment</h3>
+        <input type="text" id="mediaCaption" placeholder="Add a caption (Optional)">
+        <input type="file" id="mediaFile" accept="image/*, application/pdf" required>
+        <button id="submitMediaBtn" class="submit-btn">Upload & Send</button>
+    </div>
+
+    <script type="module">
+        // APPWRITE INTEGRATION
+        import { Client, Account, Databases, Storage, Query, ID } from "https://cdn.jsdelivr.net/npm/appwrite@14.0.1/+esm";
+
+        // Configuration setup
+        const APPWRITE_ENDPOINT = "https://sgp.cloud.appwrite.io/v1";
+        const APPWRITE_PROJECT_ID = "6a21633800287cda70c6";
+        const APPWRITE_DB_ID = "6a21640d001592135482";
+        const APPWRITE_COL_ID = "profiles"; // Provided collection ID
+        const APPWRITE_BUCKET_ID = "chat_media"; // Make sure to configure this storage bucket in your Appwrite Console
+
+        // Initialize Appwrite Client
+        const client = new Client()
+            .setEndpoint(APPWRITE_ENDPOINT)
+            .setProject(APPWRITE_PROJECT_ID);
+
+        const account = new Account(client);
+        const db = new Databases(client);
+        const storage = new Storage(client);
+
+        let currentUserUid = null;
+        let currentUserEmail = null;
+        let currentUserName = "User";
+        let targetUserEmail = null;
+        let chatID = null;
+        let currentFilter = 'all';
+        let unsubscribeChat = null;
+
+        const chatMessages = document.getElementById('chatMessages');
+        const chatForm = document.getElementById('chatForm');
+        const messageInput = document.getElementById('messageInput');
+        const chattingWithTitle = document.getElementById('chattingWith');
+        const avatarIcon = document.getElementById('avatarIcon');
+        
+        const topRightName = document.getElementById('topRightName');
+        const topRightAvatar = document.getElementById('topRightAvatar');
+
+        const fallbackUI = document.getElementById('fallbackUI');
+        const selfWarningUI = document.getElementById('selfWarningUI');
+
+        // Modal Elements
+        const modalOverlay = document.getElementById('modalOverlay');
+        const addEntryModal = document.getElementById('addEntryModal');
+        const btnOpenModal = document.getElementById('btnOpenModal');
+        const btnCloseModal = document.getElementById('btnCloseModal');
+        const submitMediaBtn = document.getElementById('submitMediaBtn');
+        const mediaFile = document.getElementById('mediaFile');
+        const mediaCaption = document.getElementById('mediaCaption');
+
+        // Filter Elements
+        const btnAllItems = document.getElementById('btnAllItems');
+        const btnMyItems = document.getElementById('btnMyItems');
+
+        // Extract target from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        targetUserEmail = urlParams.get('user');
+        const targetUserName = urlParams.get('name'); 
+
+        if (!targetUserEmail) {
+            fallbackUI.style.display = 'flex';
+        } else {
+            let displayHandle = targetUserName || targetUserEmail.split('@')[0];
+            displayHandle = displayHandle.charAt(0).toUpperCase() + displayHandle.slice(1);
+            chattingWithTitle.innerText = displayHandle;
+            avatarIcon.innerText = displayHandle.charAt(0).toUpperCase();
+        }
+
+        // --- AUTHENTICATION CHECK & INIT ---
+        async function checkAuth() {
+            try {
+                const user = await account.get();
+                currentUserUid = user.$id;
+                currentUserEmail = user.email;
+
+                const realName = user.name;
+                const emailPrefix = user.email ? user.email.split('@')[0] : "User";
+                currentUserName = realName || (emailPrefix.charAt(0).toUpperCase() + emailPrefix.slice(1));
+
+                if (topRightName) {
+                    topRightName.innerText = currentUserName;
+                    topRightName.style.display = 'block';
+                }
+                if (topRightAvatar) {
+                    topRightAvatar.innerText = currentUserName.charAt(0).toUpperCase();
+                    topRightAvatar.style.display = 'flex';
+                }
+
+                if (currentUserEmail === targetUserEmail) {
+                    selfWarningUI.style.display = 'flex';
+                    return;
+                }
+
+                if (targetUserEmail) {
+                    // Unique Chat ID calculation
+                    const participantEmails = [currentUserEmail, targetUserEmail].sort();
+                    chatID = (participantEmails[0] + '_' + participantEmails[1]).replace(/\./g, ',');
+                    
+                    loadChatFeed();
+                }
+            } catch (error) {
+                console.error("Authentication error:", error);
+                window.location.href = "login.html";
+            }
+        }
+
+        // Run checking process
+        checkAuth();
+
+        // --- PRIME STANDARD 3: DUAL-VIEW FILTER LOGIC ---
+        btnAllItems.onclick = () => {
+            if (currentFilter === 'all') return;
+            currentFilter = 'all';
+            btnAllItems.classList.add('active');
+            btnMyItems.classList.remove('active');
+            loadChatFeed();
+        };
+
+        btnMyItems.onclick = () => {
+            if (currentFilter === 'mine') return;
+            currentFilter = 'mine';
+            btnMyItems.classList.add('active');
+            btnAllItems.classList.remove('active');
+            loadChatFeed();
+        };
+
+        // Load chat data and register listener
+        async function loadChatFeed() {
+            if (!chatID) return;
+            
+            // Clean up previous registration if any
+            if (unsubscribeChat) {
+                unsubscribeChat();
+                unsubscribeChat = null;
+            }
+
+            // Central rendering wrapper to execute logic cleanly
+            async function fetchAndRender() {
+                try {
+                    let queries = [
+                        Query.equal('chatID', chatID),
+                        Query.orderAsc('timestamp'),
+                        Query.limit(100)
+                    ];
+
+                    if (currentFilter === 'mine') {
+                        queries.push(Query.equal('uid', currentUserUid));
+                    }
+
+                    const response = await db.listDocuments(
+                        APPWRITE_DB_ID,
+                        APPWRITE_COL_ID,
+                        queries
+                    );
+
+                    chatMessages.innerHTML = '';
+                    
+                    if (response.documents.length === 0) {
+                        chatMessages.innerHTML = `<div style="text-align:center; color:var(--text-muted); margin-top:2rem;">No messages found.</div>`;
+                        return;
+                    }
+
+                    response.documents.forEach(msg => renderMessage(msg));
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                } catch (error) {
+                    console.error("Error retrieving documents:", error);
+                    chatMessages.innerHTML = `<div style="text-align:center; color:var(--text-muted); margin-top:2rem;">Unable to access chat directory. Please verify attributes and indexes in Appwrite console.</div>`;
+                }
+            }
+
+            // Perform initial load
+            await fetchAndRender();
+
+            // Set up real-time listener updates feed instantly
+            try {
+                unsubscribeChat = client.subscribe(
+                    `databases.${APPWRITE_DB_ID}.collections.${APPWRITE_COL_ID}.documents`,
+                    (response) => {
+                        const eventTarget = response.events;
+                        if (eventTarget.some(event => event.includes('.create') || event.includes('.update') || event.includes('.delete'))) {
+                            fetchAndRender();
+                        }
+                    }
+                );
+            } catch (err) {
+                console.error("Failed to establish real-time connection:", err);
+            }
+        }
+
+        function renderMessage(data) {
+            const isMe = data.uid === currentUserUid;
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isMe ? 'message-sent' : 'message-received'}`;
+
+            let timeString = 'Just now';
+            if (data.timestamp) {
+                try {
+                    timeString = new Date(data.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                } catch (e) {
+                    timeString = 'Just now';
+                }
+            }
+            
+            const displayAuthor = data.authorName || "User";
+            const authorNameHTML = `<div class="author-name">${displayAuthor}</div>`;
+            
+            // Image Attachment handling
+            const imageHTML = data.fileUrl ? `<img src="${data.fileUrl}" alt="Attachment">` : '';
+            const textHTML = data.text ? `<span class="msg-text">${data.text}</span>` : '';
+
+            messageDiv.innerHTML = `
+                ${authorNameHTML}
+                ${imageHTML}
+                ${textHTML}
+                <div class="msg-meta">
+                    <span class="msg-time">${timeString}</span>
+                </div>
+            `;
+            chatMessages.appendChild(messageDiv);
+        }
+
+        // --- PRIME STANDARD 2: FIRESTORE & STORAGE SYNC ---
+        // Modal Event Listeners
+        btnOpenModal.onclick = () => {
+            modalOverlay.style.display = 'block';
+            addEntryModal.style.display = 'block';
+        };
+
+        const closeModal = () => {
+            modalOverlay.style.display = 'none';
+            addEntryModal.style.display = 'none';
+            mediaFile.value = '';
+            mediaCaption.value = '';
+        };
+
+        btnCloseModal.onclick = closeModal;
+        modalOverlay.onclick = closeModal;
+
+        // Modal Form Submit (File Upload to Appwrite Storage -> Database)
+        submitMediaBtn.onclick = async () => {
+            const file = mediaFile.files[0];
+            const caption = mediaCaption.value.trim();
+
+            if (!file) {
+                alert("Please select a file to attach.");
+                return;
+            }
+
+            submitMediaBtn.innerText = "Uploading...";
+            submitMediaBtn.disabled = true;
+
+            try {
+                // 1. Upload to Appwrite Storage FIRST
+                const uploadResponse = await storage.createFile(
+                    APPWRITE_BUCKET_ID,
+                    ID.unique(),
+                    file
+                );
+                
+                // 2. Retrieve display URL
+                const downloadURL = storage.getFileView(APPWRITE_BUCKET_ID, uploadResponse.$id).href;
+
+                // 3. Save downloadURL and data to Database collection
+                await db.createDocument(
+                    APPWRITE_DB_ID,
+                    APPWRITE_COL_ID,
+                    ID.unique(),
+                    {
+                        uid: currentUserUid,
+                        sender: currentUserEmail,
+                        authorName: currentUserName,
+                        text: caption,
+                        fileUrl: downloadURL,
+                        chatID: chatID,
+                        timestamp: new Date().toISOString()
+                    }
+                );
+
+                closeModal();
+            } catch (error) {
+                console.error("Attachment failed:", error);
+                alert("Failed to complete upload. Please ensure your bucket policy allows access.");
+            } finally {
+                submitMediaBtn.innerText = "Upload & Send";
+                submitMediaBtn.disabled = false;
+            }
+        };
+
+        // Standard Chat Submit (Text Only)
+        chatForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const text = messageInput.value.trim();
+
+            if (text && chatID && currentUserUid) {
+                const inputField = messageInput;
+                inputField.value = ""; // Clear input immediately for responsive UX
+                
+                try {
+                    await db.createDocument(
+                        APPWRITE_DB_ID,
+                        APPWRITE_COL_ID,
+                        ID.unique(),
+                        {
+                            uid: currentUserUid,
+                            sender: currentUserEmail,
+                            authorName: currentUserName,
+                            text: text,
+                            fileUrl: null,
+                            chatID: chatID,
+                            timestamp: new Date().toISOString()
+                        }
+                    );
+                } catch (error) {
+                    console.error("Message transmission failed:", error);
+                }
+            }
+        });
+    </script>
+    <script type="module" src="notifications.js"></script>
+</body>
+</html>

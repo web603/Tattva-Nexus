@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Tattva Nexus - Profile Setup</title>
+    <!-- Premium Typography: Inter (UI) & JetBrains Mono (Metrics) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* ==========================================================================
+           GLOBAL HIGH-FIDELITY LIGHT-MODE SYSTEM
+           ========================================================================== */
+        :root {
+            /* Light Theme Canvas Base */
+            --bg-base: #f9fafb;
+            
+            /* Brand Vectors */
+            --brand-teal: #0fa391;
+            --brand-teal-hover: #0d8c7c;
+            --brand-indigo: #6366f1;
+            
+            /* Typography Palette */
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --text-inverse: #ffffff;
+            
+            /* Apple/Vercel Frosted Glass Variables */
+            --glass-bg: rgba(255, 255, 255, 0.5);
+            --glass-border: rgba(255, 255, 255, 0.7);
+            --glass-border-hover: rgba(255, 255, 255, 0.9);
+            --input-bg: rgba(255, 255, 255, 0.6);
+            --input-border: rgba(203, 213, 225, 0.5);
+            
+            /* Notification States */
+            --error-color: #ef4444;
+            --success-color: #10b981;
+            
+            /* Physics Engine */
+            --anim-snappy: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            --shadow-glass: 0 4px 12px rgba(0,0,0,0.02), 
+                            0 16px 32px rgba(9,32,26,0.04), 
+                            0 32px 64px rgba(9,32,26,0.06);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', -apple-system, sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Ambient Mesh Background Canvas */
+        body {
+            background-color: var(--bg-base);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        body::before, body::after {
+            content: '';
+            position: fixed;
+            width: 70vw;
+            height: 70vw;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: -1;
+            filter: blur(120px);
+            opacity: 0.08;
+            animation: breathe 15s ease-in-out infinite alternate;
+        }
+
+        body::before {
+            top: -20vh;
+            right: -20vw;
+            background: var(--brand-teal);
+        }
+
+        body::after {
+            bottom: -20vh;
+            left: -20vw;
+            background: var(--brand-indigo);
+            animation-delay: -5s;
+        }
+
+        @keyframes breathe {
+            0% { transform: scale(1) translate(0, 0); }
+            100% { transform: scale(1.1) translate(-5%, 5%); }
+        }
+
+        /* Monospace Metrics Constraint */
+        .mono-num {
+            font-family: 'JetBrains Mono', 'SF Mono', monospace;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* ==========================================================================
+           FLICKER-PROOF CURTAIN LOADER
+           ========================================================================== */
+        #auth-shield-loader {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #f8f9fa;
+            z-index: 99999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.5s ease;
+        }
+
+        .spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid rgba(15, 163, 145, 0.2);
+            border-top-color: var(--brand-teal);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        #auth-shield-loader p {
+            color: var(--text-muted);
+            font-weight: 500;
+            font-size: 0.95rem;
+            letter-spacing: 0.5px;
+            animation: pulseText 1.5s infinite;
+        }
+
+        @keyframes pulseText {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+
+        /* ==========================================================================
+           MOBILE-FIRST SPLIT ARCHITECTURE
+           ========================================================================== */
+        /* HIDDEN BY DEFAULT TO PREVENT FLICKER */
+        #onboarding-workspace {
+            display: none; 
+            opacity: 0;
+            flex: 1;
+            width: 100%;
+            transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            flex-direction: column;
+        }
+
+        /* Left Pane (Hidden on Mobile) */
+        .left-pane {
+            display: none;
+            background: linear-gradient(135deg, rgba(15, 163, 145, 0.08) 0%, rgba(99, 102, 241, 0.04) 100%);
+            border-right: 1px solid rgba(255, 255, 255, 0.4);
+            padding: 4rem;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+        }
+
+        .branding-content {
+            max-width: 480px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2.5rem;
+            letter-spacing: -0.5px;
+            color: var(--text-main);
+        }
+
+        .logo-icon {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, var(--brand-teal) 0%, var(--brand-indigo) 100%);
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #ffffff;
+            font-weight: 800;
+            font-size: 1.5rem;
+            box-shadow: 0 8px 16px rgba(15, 163, 145, 0.25);
+        }
+
+        .branding-content h1 {
+            font-size: 3rem;
+            line-height: 1.15;
+            margin-bottom: 1.5rem;
+            font-weight: 800;
+            color: var(--text-main);
+            letter-spacing: -1px;
+        }
+
+        .branding-content p {
+            color: var(--text-muted);
+            font-size: 1.15rem;
+            line-height: 1.6;
+        }
+
+        /* Right Pane (Workspace) */
+        .right-pane {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem 1.2rem;
+            width: 100%;
+            overflow-y: auto;
+        }
+
+        /* Premium Apple/Vercel Glass Panel */
+        .glass-panel {
+            width: 100%;
+            max-width: 650px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(24px) saturate(140%);
+            -webkit-backdrop-filter: blur(24px) saturate(140%);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 2rem 1.5rem;
+            box-shadow: var(--shadow-glass);
+            margin: 0 auto;
+        }
+
+        /* ==========================================================================
+           WIZARD PROGRESS TRACKER
+           ========================================================================== */
+        .progress-indicator {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 35px;
+            position: relative;
+            padding: 0 15px;
+        }
+
+        .progress-indicator::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 25px;
+            right: 25px;
+            height: 2px;
+            background: rgba(0, 0, 0, 0.06);
+            transform: translateY(-50%);
+            z-index: 0;
+        }
+
+        .progress-step {
+            position: relative;
+            z-index: 1;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #ffffff;
+            border: 2px solid rgba(0,0,0,0.08);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-muted);
+            transition: var(--anim-snappy);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+        }
+
+        .progress-step.active {
+            border-color: var(--brand-teal);
+            background: rgba(15, 163, 145, 0.1);
+            color: var(--brand-teal);
+            box-shadow: 0 0 0 4px rgba(15, 163, 145, 0.15);
+        }
+
+        .progress-step.completed {
+            border-color: var(--brand-teal);
+            background: var(--brand-teal);
+            color: #fff;
+        }
+
+        /* Step Panels Visibility Controller */
+        .step-panel {
+            display: none;
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        .step-panel.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+            animation: slideUpFade 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        @keyframes slideUpFade {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .panel-header { margin-bottom: 25px; }
+
+        .panel-header h2 {
+            font-size: 1.6rem;
+            color: var(--text-main);
+            margin-bottom: 10px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .panel-header p {
+            color: var(--text-muted);
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        /* ==========================================================================
+           FORM INPUTS & MICRO-INTERACTIONS
+           ========================================================================== */
+        .form-group { margin-bottom: 22px; }
+
+        .form-group label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-control {
+            width: 100%;
+            background: var(--input-bg);
+            border: 1px solid var(--input-border);
+            border-radius: 12px;
+            padding: 14px 16px;
+            color: var(--text-main);
+            font-size: 0.95rem;
+            transition: var(--anim-snappy);
+            outline: none;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.01);
+        }
+
+        .form-control::placeholder { color: #94a3b8; }
+
+        .form-control:focus {
+            border-color: var(--brand-teal);
+            background: #ffffff;
+            box-shadow: 0 0 0 4px rgba(15, 163, 145, 0.1), inset 0 2px 4px rgba(0,0,0,0.01);
+        }
+
+        /* ==========================================================================
+           PILL SELECTION ENGINE (FIVERR STYLE)
+           ========================================================================== */
+        .category-block { margin-bottom: 20px; }
+        
+        .category-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 10px;
+        }
+
+        .pill-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .pill-badge {
+            background: rgba(0, 0, 0, 0.03);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            color: var(--text-muted);
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--anim-snappy);
+            user-select: none;
+            display: flex;
+            align-items: center;
+        }
+
+        .pill-badge:hover {
+            background: rgba(0, 0, 0, 0.06);
+            color: var(--text-main);
+            transform: translateY(-2px);
+        }
+
+        .pill-badge:active { transform: translateY(0) scale(0.96); }
+
+        .pill-badge.active {
+            background: var(--brand-teal);
+            border-color: var(--brand-teal);
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(15, 163, 145, 0.25);
+        }
+
+        /* Achievement Chips */
+        .chips-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .chip {
+            background: #ffffff;
+            border: 1px solid rgba(15, 163, 145, 0.3);
+            color: var(--brand-teal);
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+        }
+
+        .chip span {
+            cursor: pointer;
+            color: var(--text-muted);
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: var(--anim-snappy);
+        }
+
+        .chip span:hover { color: var(--error-color); }
+
+        /* ==========================================================================
+           TERMS & SECURITY UI
+           ========================================================================== */
+        .terms-box {
+            background: #ffffff;
+            border: 1px solid var(--input-border);
+            border-radius: 12px;
+            padding: 20px;
+            height: 220px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            font-size: 0.85rem;
+            line-height: 1.6;
+            color: var(--text-muted);
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        .terms-box::-webkit-scrollbar { width: 6px; }
+        .terms-box::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 10px; }
+
+        .terms-box h3 {
+            font-size: 0.95rem;
+            margin-bottom: 6px;
+            color: var(--text-main);
+            margin-top: 15px;
+            font-weight: 700;
+        }
+        
+        .terms-box h3:first-child { margin-top: 0; }
+
+        .checkbox-wrapper {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            background: #ffffff;
+            padding: 16px;
+            border-radius: 12px;
+            border: 1px solid var(--input-border);
+            cursor: pointer;
+            transition: var(--anim-snappy);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+        }
+
+        .checkbox-wrapper:hover { border-color: rgba(15, 163, 145, 0.4); }
+
+        .checkbox-wrapper input[type="checkbox"] {
+            appearance: none;
+            width: 22px;
+            height: 22px;
+            border: 2px solid var(--input-border);
+            border-radius: 6px;
+            background: var(--bg-base);
+            cursor: pointer;
+            position: relative;
+            transition: var(--anim-snappy);
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .checkbox-wrapper input[type="checkbox"]:checked {
+            background: var(--brand-teal);
+            border-color: var(--brand-teal);
+        }
+
+        .checkbox-wrapper input[type="checkbox"]:checked::after {
+            content: '';
+            position: absolute;
+            left: 6px;
+            top: 3px;
+            width: 5px;
+            height: 10px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+
+        .checkbox-wrapper label {
+            font-size: 0.95rem;
+            color: var(--text-main);
+            cursor: pointer;
+            user-select: none;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+
+        /* ==========================================================================
+           BUTTON CONTROLS
+           ========================================================================== */
+        .navigation-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 15px 24px;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--anim-snappy);
+            outline: none;
+            border: none;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+        }
+
+        .btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+        }
+
+        .btn:active:not(:disabled) {
+            transform: translateY(0) scale(0.98);
+        }
+
+        .btn-primary {
+            background: var(--brand-teal);
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(15, 163, 145, 0.25);
+        }
+
+        .btn-primary:hover:not(:disabled) { background: var(--brand-teal-hover); box-shadow: 0 6px 16px rgba(15, 163, 145, 0.35); }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--text-main);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-outline:hover {
+            background: rgba(0,0,0,0.02);
+            border-color: rgba(0, 0, 0, 0.2);
+        }
+
+        .btn:disabled {
+            background: rgba(0,0,0,0.05);
+            color: var(--text-muted);
+            cursor: not-allowed;
+            border: 1px solid transparent;
+            box-shadow: none;
+            transform: none;
+        }
+
+        #status-message {
+            padding: 14px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: none;
+            text-align: center;
+        }
+
+        #status-message.error {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--error-color);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        #status-message.success {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success-color);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        /* Desktop Split-Screen Upgrade */
+        @media (min-width: 992px) {
+            #onboarding-workspace {
+                flex-direction: row;
+            }
+            .left-pane {
+                display: flex;
+                flex: 1;
+            }
+            .right-pane {
+                flex: 1.2;
+                padding: 4rem;
+                justify-content: center;
+            }
+            .glass-panel {
+                padding: 3rem;
+            }
+            .navigation-controls {
+                flex-direction: row;
+            }
+            .btn {
+                flex: 1;
+            }
+            .btn-outline {
+                flex: 0.5;
+            }
+            .form-row {
+                display: flex;
+                gap: 15px;
+                margin-bottom: 15px;
+            }
+        }
+        
+        /* Mobile Form Row Fallback */
+        @media (max-width: 991px) {
+            .form-row {
+                display: flex;
+                flex-direction: column;
+                gap: 15px;
+                margin-bottom: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ==========================================
+         FLICKER-PROOF LOADING CURTAIN
+         ========================================== -->
+    <div id="auth-shield-loader">
+        <div class="spinner"></div>
+        <p class="mono-num">SECURE SYSTEM VERIFICATION</p>
+    </div>
+
+    <!-- ==========================================
+         MAIN WORKSPACE (Hidden on Load)
+         ========================================== -->
+    <div id="onboarding-workspace">
+        
+        <!-- LEFT PANE: BRANDING (Desktop Only) -->
+        <div class="left-pane">
+            <div class="branding-content">
+                <div class="logo">
+                    <div class="logo-icon">T</div>
+                    Tattva Nexus
+                </div>
+                <h1>Architect your digital identity.</h1>
+                <p>Initialize your workspace parameters. Our ecosystem algorithm relies on accurate skills and interests to route exclusive freelance gigs and intelligently assign project syndicates.</p>
+            </div>
+        </div>
+
+        <!-- RIGHT PANE: FORM WORKSPACE -->
+        <div class="right-pane">
+            <div class="glass-panel">
+                
+                <!-- PROGRESS TRACKER -->
+                <div class="progress-indicator">
+                    <div class="progress-step active mono-num" id="ind-1">1</div>
+                    <div class="progress-step mono-num" id="ind-2">2</div>
+                    <div class="progress-step mono-num" id="ind-3">3</div>
+                </div>
+
+                <div id="status-message"></div>
+
+                <form id="onboardingForm">
+                    
+                    <!-- 🛑 STATE 1: WELCOME -->
+                    <div class="step-panel active" id="state-welcome">
+                        <div class="panel-header">
+                            <h2>Welcome to Tattva Nexus, have a great journey ahead!</h2>
+                            <p>Let's customize your workspace. Building out your professional credentials allows us to match you with relevant campus freelance gigs, generate robust project teams, calculate trust network ratings, and authenticate marketplace listing compliance.</p>
+                        </div>
+                        <div class="navigation-controls">
+                            <button type="button" class="btn btn-outline" id="btn-skip">Skip for Now</button>
+                            <button type="button" class="btn btn-primary" id="btn-proceed">Proceed &rarr;</button>
+                        </div>
+                    </div>
+
+                    <!-- 🛑 STATE 2: FIELDS & METRICS -->
+                    <div class="step-panel" id="state-fields">
+                        <div class="panel-header">
+                            <h2>Competencies & Ecosystem Focus</h2>
+                            <p>Select the vectors you excel in and what domains you wish to pursue.</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Achievements (Press Enter)</label>
+                            <input type="text" id="achievementInput" class="form-control" placeholder="e.g., Dean's List, AWS Certified">
+                            <div class="chips-container" id="achievements-container"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Core Skills & Services</label>
+                            <div class="category-block">
+                                <div class="category-title">Tech & Engineering</div>
+                                <div class="pill-grid" id="skills-tech"></div>
+                            </div>
+                            <div class="category-block">
+                                <div class="category-title">Creative & Design</div>
+                                <div class="pill-grid" id="skills-creative"></div>
+                            </div>
+                            <div class="category-block">
+                                <div class="category-title">Business</div>
+                                <div class="pill-grid" id="skills-business"></div>
+                            </div>
+                        </div>
+
+                        <div class="form-group" style="margin-top: 25px;">
+                            <label>Interests & Learning Focus</label>
+                            <div class="category-block">
+                                <div class="category-title">Tech & Engineering</div>
+                                <div class="pill-grid" id="interests-tech"></div>
+                            </div>
+                            <div class="category-block">
+                                <div class="category-title">Creative & Design</div>
+                                <div class="pill-grid" id="interests-creative"></div>
+                            </div>
+                            <div class="category-block">
+                                <div class="category-title">Business</div>
+                                <div class="pill-grid" id="interests-business"></div>
+                            </div>
+                        </div>
+
+                        <div class="form-group" style="margin-top: 25px;">
+                            <label>Digital Footprint URLs</label>
+                            <div class="form-row">
+                                <input type="url" id="linkedinUrl" class="form-control" placeholder="LinkedIn Profile">
+                                <input type="url" id="githubUrl" class="form-control" placeholder="GitHub Profile">
+                            </div>
+                            <input type="url" id="portfolioUrl" class="form-control" placeholder="Personal Portfolio Website">
+                        </div>
+
+                        <div class="navigation-controls">
+                            <button type="button" class="btn btn-outline" id="btn-back-fields">Back</button>
+                            <button type="button" class="btn btn-primary" id="btn-next-fields">Next: Secure Platform Check</button>
+                        </div>
+                    </div>
+
+                    <!-- 🛑 STATE 3: TERMS & LEGAL GATE -->
+                    <div class="step-panel" id="state-terms">
+                        <div class="panel-header">
+                            <h2>Community Protocol & Legal Gateway</h2>
+                            <p>Review the platform rules. A secure ecosystem relies on absolute mutual accountability.</p>
+                        </div>
+
+                        <div class="terms-box">
+                            <h3>1. Acceptance of Conditions</h3>
+                            <p>By initializing a profile on the Tattva Nexus mainframe, you inherently agree to these terms, our Privacy Guidelines, and Academic Integrity policies. If you do not accept, you must exit the gateway immediately.</p>
+                            
+                            <h3>2. Code of Conduct & Academic Integrity</h3>
+                            <p>Tattva Nexus is an encrypted intellectual sanctuary. Harassment, plagiarizing code, fraudulent service listings, hate speech, and platform manipulation are strictly prohibited. The system logs meta-actions, and infractions trigger automatic and permanent isolation from the network.</p>
+
+                            <h3>3. Decentralized Data Sovereignty</h3>
+                            <p>Your data belongs to you. We utilize localized academic vectors solely to optimize peer matching, calculate trust index ratings, and authenticate gig transactions. Zero data is routed to external third-party advertising algorithms.</p>
+
+                            <h3>4. Financial & Marketplace Integrity</h3>
+                            <p>Any skill bartering, token exchange, or freelance capital processed through external channels is at the sole liability of the transacting users. The Nexus operates as a networking overlay, not a legally bonded financial proxy.</p>
+
+                            <h3>5. Intellectual Property Allocation</h3>
+                            <p>You retain full proprietary rights over the source code, art, and literature you publish. You grant the Nexus a transient operational license strictly to display said work securely within authenticated platform nodes.</p>
+                        </div>
+
+                        <div class="checkbox-wrapper">
+                            <input type="checkbox" id="termsAccept">
+                            <label for="termsAccept">I agree to the Tattva Nexus Terms of Service and Privacy Policy.</label>
+                        </div>
+
+                        <div class="navigation-controls">
+                            <button type="button" class="btn btn-outline" id="btn-back-terms">Back</button>
+                            <button type="button" class="btn btn-primary" id="btn-submit" disabled>Complete Onboarding Setup</button>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==========================================================================
+         FIREBASE v9+ MODULAR ENGINE & STATE LOGIC
+         ========================================================================== -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+        // 🛑 FIREBASE CONFIGURATION (Replace with Production Keys)
+        const firebaseConfig = {
+            apiKey: "AIzaSyCLo9rfV279AoHGGs3HheHgYQ5EgLcCzJo",
+            authDomain: "tattva-nexus.firebaseapp.com",
+            projectId: "tattva-nexus",
+            storageBucket: "tattva-nexus.firebasestorage.app",
+            messagingSenderId: "275334528",
+            appId: "1:275334528:web:48a4d050fdb91c1c142d65"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // ==========================================
+        // SYSTEM CONFIGURATION & AUTH GAUNTLET
+        // ==========================================
+        const IS_DEV_MODE = true; // Toggle for local UI/UX testing without Firebase constraints
+        let currentUser = null;
+        let isProfileSkipped = false;
+
+        // FLICKER-PROOF ONE-TIME VALIDATION
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUser = user;
+                try {
+                    const docRef = doc(db, "users", user.uid);
+                    const docSnap = await getDoc(docRef);
+                    
+                    // Route Check
+                    if (docSnap.exists() && docSnap.data().onboardingCompleted === true) {
+                        console.info("Identity Confirmed: Routing to Dashboard silently.");
+                        window.location.replace("dashboard.html");
+                    } else {
+                        revealWorkspace();
+                    }
+                } catch (error) {
+                    console.error("Gauntlet Read Error:", error);
+                    revealWorkspace();
+                }
+            } else {
+                if (!IS_DEV_MODE) {
+                    window.location.replace("login.html");
+                } else {
+                    console.warn("[DEV MODE] Localhost bypass active. Generating mock identity.");
+                    currentUser = { uid: "dev-local-user-999" };
+                    revealWorkspace();
+                }
+            }
+        });
+
+        function revealWorkspace() {
+            const loader = document.getElementById('auth-shield-loader');
+            const workspace = document.getElementById('onboarding-workspace');
+            
+            loader.style.opacity = '0';
+            setTimeout(() => {
+                loader.style.display = 'none';
+                workspace.style.display = 'flex';
+                // Trigger CSS transition reflow
+                setTimeout(() => {
+                    workspace.style.opacity = '1';
+                }, 50);
+            }, 500);
+        }
+
+        // ==========================================
+        // DATA STRUCTURES
+        // ==========================================
+        const categories = {
+            tech: ["Web Dev", "Python/AI", "Cloud", "Cybersecurity", "UI/UX", "Mobile Apps"],
+            creative: ["Graphic Design", "Video Editing", "Content Writing", "3D Modeling", "Branding"],
+            business: ["Product Mgmt", "Marketing", "SEO", "Finance", "Event Planning"]
+        };
+
+        const setSkills = new Set();
+        const setInterests = new Set();
+        const arrAchievements = [];
+
+        // ==========================================
+        // UI BINDINGS & RENDERERS
+        // ==========================================
+        const msgBox = document.getElementById('status-message');
+        function showMsg(txt, type) {
+            msgBox.textContent = txt;
+            msgBox.className = type;
+            msgBox.style.display = 'block';
+            msgBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        function hideMsg() { msgBox.style.display = 'none'; }
+
+        // Render Pills
+        function renderGrid(containerId, dataArray, targetSet) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            dataArray.forEach(item => {
+                const el = document.createElement('div');
+                el.className = 'pill-badge';
+                el.innerText = item;
+                el.addEventListener('click', () => {
+                    if (targetSet.has(item)) {
+                        targetSet.delete(item);
+                        el.classList.remove('active');
+                    } else {
+                        targetSet.add(item);
+                        el.classList.add('active');
+                    }
+                });
+                container.appendChild(el);
+            });
+        }
+
+        renderGrid('skills-tech', categories.tech, setSkills);
+        renderGrid('skills-creative', categories.creative, setSkills);
+        renderGrid('skills-business', categories.business, setSkills);
+        renderGrid('interests-tech', categories.tech, setInterests);
+        renderGrid('interests-creative', categories.creative, setInterests);
+        renderGrid('interests-business', categories.business, setInterests);
+
+        // Achievements Chip Logic
+        const achieveInput = document.getElementById('achievementInput');
+        const achieveContainer = document.getElementById('achievements-container');
+        
+        achieveInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const val = achieveInput.value.trim();
+                if (val && !arrAchievements.includes(val)) {
+                    arrAchievements.push(val);
+                    achieveInput.value = '';
+                    renderAchievements();
+                }
+            }
+        });
+
+        function renderAchievements() {
+            achieveContainer.innerHTML = '';
+            arrAchievements.forEach((item, idx) => {
+                const chip = document.createElement('div');
+                chip.className = 'chip';
+                chip.innerHTML = `${item} <span data-idx="${idx}">&times;</span>`;
+                chip.querySelector('span').addEventListener('click', (e) => {
+                    const i = e.target.getAttribute('data-idx');
+                    arrAchievements.splice(i, 1);
+                    renderAchievements();
+                });
+                achieveContainer.appendChild(chip);
+            });
+        }
+
+        // Prevent Global Form Submission on Enter
+        document.getElementById('onboardingForm').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') e.preventDefault();
+        });
+
+        // ==========================================
+        // STATE MACHINE NAVIGATION
+        // ==========================================
+        const state1 = document.getElementById('state-welcome');
+        const state2 = document.getElementById('state-fields');
+        const state3 = document.getElementById('state-terms');
+        
+        const ind1 = document.getElementById('ind-1');
+        const ind2 = document.getElementById('ind-2');
+        const ind3 = document.getElementById('ind-3');
+
+        function updateTracker(step) {
+            ind1.className = 'progress-step mono-num' + (step >= 1 ? ' active' : '') + (step > 1 ? ' completed' : '');
+            ind2.className = 'progress-step mono-num' + (step >= 2 ? ' active' : '') + (step > 2 ? ' completed' : '');
+            ind3.className = 'progress-step mono-num' + (step >= 3 ? ' active' : '') + (step > 3 ? ' completed' : '');
+            
+            if (step > 1) ind1.innerHTML = '&#10003;'; else ind1.innerHTML = '1';
+            if (step > 2) ind2.innerHTML = '&#10003;'; else ind2.innerHTML = '2';
+        }
+
+        document.getElementById('btn-proceed').addEventListener('click', () => {
+            hideMsg(); isProfileSkipped = false;
+            state1.classList.remove('active'); state2.classList.add('active'); updateTracker(2);
+        });
+
+        document.getElementById('btn-skip').addEventListener('click', () => {
+            hideMsg(); isProfileSkipped = true;
+            state1.classList.remove('active'); state3.classList.add('active'); updateTracker(3);
+        });
+
+        document.getElementById('btn-next-fields').addEventListener('click', () => {
+            hideMsg();
+            state2.classList.remove('active'); state3.classList.add('active'); updateTracker(3);
+            document.querySelector('.right-pane').scrollTop = 0;
+        });
+
+        document.getElementById('btn-back-fields').addEventListener('click', () => {
+            hideMsg();
+            state2.classList.remove('active'); state1.classList.add('active'); updateTracker(1);
+        });
+
+        document.getElementById('btn-back-terms').addEventListener('click', () => {
+            hideMsg();
+            state3.classList.remove('active');
+            if (isProfileSkipped) {
+                state1.classList.add('active'); updateTracker(1);
+            } else {
+                state2.classList.add('active'); updateTracker(2);
+            }
+        });
+
+        // ==========================================
+        // DATABASE WRITE & ATOMIC COMPLETION
+        // ==========================================
+        const chkTerms = document.getElementById('termsAccept');
+        const btnSubmit = document.getElementById('btn-submit');
+
+        chkTerms.addEventListener('change', () => {
+            btnSubmit.disabled = !chkTerms.checked;
+        });
+
+        btnSubmit.addEventListener('click', async () => {
+            hideMsg();
+            if (!chkTerms.checked) return;
+            if (!currentUser && !IS_DEV_MODE) {
+                showMsg("Session expired. Please reload and log in.", "error"); return;
+            }
+
+            // Lock UI Action Buttons
+            btnSubmit.disabled = true;
+            document.getElementById('btn-back-terms').disabled = true;
+            btnSubmit.innerText = "Synchronizing Protocol...";
+
+            try {
+                const payload = {
+                    termsAccepted: true,
+                    onboardingCompleted: true,
+                    updatedAt: Date.now()
+                };
+
+                if (isProfileSkipped) {
+                    payload.skills = [];
+                    payload.interests = [];
+                    payload.achievements = [];
+                    payload.links = { linkedin: "", github: "", portfolio: "" };
+                } else {
+                    payload.skills = Array.from(setSkills);
+                    payload.interests = Array.from(setInterests);
+                    payload.achievements = arrAchievements;
+                    payload.links = {
+                        linkedin: document.getElementById('linkedinUrl').value.trim(),
+                        github: document.getElementById('githubUrl').value.trim(),
+                        portfolio: document.getElementById('portfolioUrl').value.trim()
+                    };
+                }
+
+                if (!IS_DEV_MODE || currentUser.uid !== "dev-local-user-999") {
+                    const userRef = doc(db, "users", currentUser.uid);
+                    await updateDoc(userRef, payload);
+                } else {
+                    console.log("[DEV MODE] Firestore bypassed. Payload: ", payload);
+                }
+
+                ind3.classList.remove('active');
+                ind3.classList.add('completed');
+                ind3.innerHTML = '&#10003;';
+
+                showMsg("Setup Complete! Rerouting to Nexus Hub...", "success");
+                
+                setTimeout(() => {
+                    window.location.replace("dashboard.html");
+                }, 1200);
+
+            } catch (err) {
+                console.error("Database Write Failed:", err);
+                showMsg(`System Error: ${err.message}`, "error");
+                
+                btnSubmit.disabled = false;
+                document.getElementById('btn-back-terms').disabled = false;
+                btnSubmit.innerText = "Complete Onboarding Setup";
+            }
+        });
+
+    </script>
+</body>
+</html>

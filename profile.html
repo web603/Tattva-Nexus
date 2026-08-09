@@ -1,0 +1,1633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>User Profile | Tattva Nexus</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+    /* 
+    ========================================
+    GLOBAL VARIABLES & ROOT DESIGN TOKENS
+    ========================================
+    */
+    :root {
+        /* Core Brand Palette */
+        --color-primary-blue: #003B8F;
+        --color-accent-cyan: #00B4D8;
+        --color-electric-teal: #00E5FF;
+        --bg-balanced-canvas: #edf0f4;
+        
+        /* Ultra-Premium Glassmorphism Tokens */
+        --glass-bg: rgba(255, 255, 255, 0.35);
+        --glass-border: rgba(255, 255, 255, 0.65);
+        --glass-shadow: 0 4px 16px rgba(0, 59, 143, 0.03), 
+                        0 16px 48px rgba(0, 59, 143, 0.05), 
+                        0 0 40px rgba(0, 180, 216, 0.07);
+        
+        /* Semantic Colors */
+        --text-dark: #0f172a;
+        --text-slate: #64748b;
+        --success: #10b981;
+        --error: #ef4444;
+        --warning: #f59e0b;
+        
+        /* Radii */
+        --radius-xl: 24px;
+        --radius-lg: 20px;
+        --radius-md: 12px;
+        --radius-sm: 8px;
+    }
+
+    /* 
+    ========================================
+    RESET & BASE STYLES
+    ========================================
+    */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    }
+
+    body {
+        background-color: var(--bg-balanced-canvas);
+        color: var(--text-dark);
+        min-height: 100vh;
+        overflow-x: hidden;
+        position: relative;
+    }
+
+    /* Soft Ambient Mesh Canvas */
+    body::before, body::after {
+        content: '';
+        position: fixed;
+        width: 60vw;
+        height: 60vh;
+        border-radius: 50%;
+        opacity: 0.12;
+        filter: blur(150px);
+        -webkit-filter: blur(150px);
+        z-index: -1;
+        pointer-events: none;
+    }
+    body::before {
+        top: -10%;
+        left: -10%;
+        background: var(--color-primary-blue);
+    }
+    body::after {
+        bottom: -10%;
+        right: -10%;
+        background: var(--color-accent-cyan);
+    }
+
+    /* Advanced Translucent Frosted Glassmorphism Utility */
+    .glass-panel {
+        background: var(--glass-bg);
+        backdrop-filter: blur(32px) saturate(140%);
+        -webkit-backdrop-filter: blur(32px) saturate(140%);
+        border: 1px solid var(--glass-border);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--glass-shadow);
+        position: relative;
+        overflow: hidden;
+    }
+
+    /* Monospace Data Stabilizers */
+    .mono-metric {
+        font-family: 'JetBrains Mono', 'SF Mono', monospace;
+        font-variant-numeric: tabular-nums;
+        font-weight: 700;
+        letter-spacing: -0.5px;
+    }
+
+    /* 
+    ========================================
+    LAYER 1: OMNIPRESENT FLOATING HEADER BAR
+    ========================================
+    */
+    .global-header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 75px;
+        z-index: 2000;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 32px;
+        background: rgba(255, 255, 255, 0.45);
+        backdrop-filter: blur(32px) saturate(140%);
+        -webkit-backdrop-filter: blur(32px) saturate(140%);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.6);
+        box-shadow: 0 4px 24px rgba(0, 59, 143, 0.04);
+    }
+
+    .brand-logo {
+        font-size: 1.4rem;
+        font-weight: 800;
+        color: var(--color-primary-blue);
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        letter-spacing: -0.5px;
+    }
+
+    .brand-logo::before {
+        content: 'T';
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        background: linear-gradient(135deg, var(--color-primary-blue), var(--color-accent-cyan));
+        color: white;
+        border-radius: var(--radius-sm);
+        font-size: 1.2rem;
+        box-shadow: 0 4px 12px rgba(0, 59, 143, 0.2);
+    }
+
+    .header-controls {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .page-title-label {
+        font-weight: 700;
+        color: var(--text-dark);
+        border-right: 1px solid var(--glass-border);
+        padding-right: 20px;
+        margin-right: 4px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-size: 0.85rem;
+        display: none;
+    }
+
+    .search-input {
+        background: rgba(255, 255, 255, 0.5);
+        border: 1px solid var(--glass-border);
+        padding: 10px 20px;
+        border-radius: 30px;
+        width: 240px;
+        font-size: 0.9rem;
+        outline: none;
+        transition: all 0.3s ease;
+        display: none;
+    }
+    .search-input:focus {
+        background: rgba(255, 255, 255, 0.8);
+        border-color: var(--color-accent-cyan);
+        box-shadow: 0 0 0 3px rgba(0, 180, 216, 0.15);
+    }
+
+    .bell-btn {
+        background: rgba(255, 255, 255, 0.5);
+        border: 1px solid var(--glass-border);
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        cursor: pointer;
+        position: relative;
+        transition: all 0.2s;
+    }
+    .bell-btn:hover {
+        background: rgba(255, 255, 255, 0.9);
+    }
+    .bell-btn::after {
+        content: '';
+        position: absolute;
+        top: 2px;
+        right: 4px;
+        width: 10px;
+        height: 10px;
+        background: var(--color-electric-teal);
+        border-radius: 50%;
+        border: 2px solid white;
+        box-shadow: 0 0 8px rgba(0, 229, 255, 0.5);
+    }
+
+    .user-role-badge {
+        font-size: 0.75rem;
+        font-weight: 700;
+        padding: 6px 14px;
+        border-radius: 20px;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        background: rgba(255, 255, 255, 0.6);
+        border: 1px solid var(--glass-border);
+        white-space: nowrap;
+    }
+    .verified-student-badge {
+        color: var(--color-primary-blue);
+        border-color: rgba(0, 180, 216, 0.4);
+        background: linear-gradient(to right, rgba(0, 180, 216, 0.05), rgba(0, 229, 255, 0.15));
+        box-shadow: 0 2px 10px rgba(0, 180, 216, 0.1);
+    }
+    .community-member-badge {
+        color: var(--text-slate);
+    }
+
+    .header-avatar {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--color-primary-blue), var(--color-accent-cyan));
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        font-size: 1.1rem;
+        border: 2px solid white;
+        box-shadow: 0 4px 12px rgba(0, 59, 143, 0.15);
+        cursor: pointer;
+        flex-shrink: 0;
+    }
+
+    /* 
+    ========================================
+    LAYER 2: MOBILE-FIRST LAYOUT
+    ========================================
+    */
+    /* Mobile Sidebar Stack */
+    .sidebar {
+        width: 100%;
+        margin-top: 95px; /* Offset to clear the fixed header */
+        padding: 0 20px;
+        display: flex;
+        gap: 12px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        z-index: 100;
+    }
+    .sidebar::-webkit-scrollbar { display: none; }
+
+    .nav-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 18px;
+        color: var(--text-slate);
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.95rem;
+        border-radius: var(--radius-md);
+        transition: all 0.2s ease;
+        white-space: nowrap;
+        background: rgba(255, 255, 255, 0.35);
+        border: 1px solid var(--glass-border);
+    }
+    .nav-item:hover {
+        background: rgba(255, 255, 255, 0.6);
+        color: var(--color-primary-blue);
+    }
+    .nav-item.active {
+        background: rgba(255, 255, 255, 0.55);
+        color: var(--color-primary-blue);
+        border-left: 3px solid var(--color-accent-cyan);
+        box-shadow: var(--glass-shadow);
+    }
+    .nav-logout {
+        color: var(--error);
+    }
+
+    /* Mobile Main Content Stack */
+    .main-content {
+        width: 100%;
+        padding: 24px 20px 80px 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 32px;
+        min-height: calc(100vh - 95px);
+    }
+
+    /* DESKTOP ARCHITECTURE OVERRIDE */
+    @media(min-width: 992px) {
+        .page-title-label, .search-input {
+            display: block;
+        }
+
+        .sidebar {
+            width: 260px;
+            position: fixed;
+            height: calc(100vh - 95px);
+            top: 95px;
+            left: 24px;
+            margin-top: 0;
+            padding: 24px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.35);
+            backdrop-filter: blur(32px) saturate(140%);
+            -webkit-backdrop-filter: blur(32px) saturate(140%);
+            border: 1px solid rgba(255, 255, 255, 0.65);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--glass-shadow);
+        }
+
+        .nav-item {
+            padding: 14px 20px;
+            background: transparent;
+            border: none;
+            border-left: 3px solid transparent;
+            border-radius: var(--radius-md);
+        }
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.55);
+            border-bottom: none;
+            border-left: 3px solid var(--color-accent-cyan);
+        }
+        .nav-logout {
+            margin-top: auto; /* Pushes exclusively to absolute bottom */
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            background: rgba(239, 68, 68, 0.05);
+        }
+        .nav-logout:hover {
+            background: rgba(239, 68, 68, 0.15);
+        }
+
+        .main-content {
+            margin-left: 292px; /* Sidebar width + gap */
+            margin-top: 95px;
+            padding: 0 32px 48px 0;
+        }
+    }
+
+    /* 
+    ========================================
+    HERO BANNER & AVATAR BLOCK
+    ========================================
+    */
+    .hero-banner-block {
+        width: 100%;
+        position: relative;
+        padding-top: 140px; 
+    }
+
+    .hero-banner-bg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 180px;
+        background: linear-gradient(135deg, var(--color-primary-blue), var(--color-accent-cyan));
+        border-radius: var(--radius-xl);
+        overflow: hidden;
+        box-shadow: var(--glass-shadow);
+    }
+
+    /* Abstract Geometric Mesh Grid */
+    .hero-banner-bg::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: repeating-linear-gradient(45deg, rgba(255,255,255,0.06) 0px, rgba(255,255,255,0.06) 2px, transparent 2px, transparent 12px);
+    }
+
+    .neel-athane-block {
+        position: relative;
+        padding: 0 40px;
+        display: flex;
+        align-items: flex-end;
+        gap: 24px;
+        z-index: 10;
+        flex-wrap: wrap;
+    }
+
+    .profile-avatar-large {
+        width: 140px;
+        height: 140px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--color-primary-blue), var(--color-electric-teal));
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 4rem;
+        font-weight: 800;
+        border: 2px solid white; /* Crisp border stroke */
+        box-shadow: 0 12px 32px rgba(0, 59, 143, 0.25); /* Explicit shadow boundary */
+        flex-shrink: 0;
+        margin-bottom: -20px;
+    }
+
+    .profile-typography {
+        padding-bottom: 8px;
+    }
+
+    .profile-typography h1 {
+        font-size: 2.2rem;
+        font-weight: 800;
+        color: var(--text-dark);
+        margin-bottom: 4px;
+        line-height: 1.1;
+        letter-spacing: -0.5px;
+    }
+
+    .profile-typography p {
+        font-size: 0.875rem; /* text-sm format */
+        color: #64748B; /* Soft slate gray */
+        font-weight: 500;
+        line-height: 1.4;
+        max-width: 500px;
+    }
+
+    /* 
+    ========================================
+    LOWER SPLIT WORKSPACE GRID
+    ========================================
+    */
+    .workspace-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 32px;
+        margin-top: 24px;
+    }
+
+    /* Explicit Desktop 2-column Layout */
+    @media(min-width: 1100px) {
+        .workspace-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 32px;
+        }
+    }
+
+    /* Left Stack & Right Stack Containers */
+    .left-stack { display: flex; flex-direction: column; gap: 24px; }
+    .right-stack { display: flex; flex-direction: column; gap: 24px; }
+
+    .content-card {
+        padding: 32px;
+    }
+
+    .card-title {
+        font-size: 1.15rem;
+        font-weight: 800;
+        color: var(--color-primary-blue);
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        letter-spacing: -0.3px;
+        border-bottom: 1px solid var(--glass-border);
+        padding-bottom: 12px;
+    }
+
+    /* Left Narrow Column Info Modules */
+    .bio-text {
+        font-size: 0.95rem;
+        line-height: 1.6;
+        color: var(--text-slate);
+        margin-bottom: 24px;
+    }
+
+    .info-list { list-style: none; }
+    .info-list li {
+        margin-bottom: 16px;
+        padding-bottom: 16px;
+        border-bottom: 1px dashed rgba(0, 0, 0, 0.05);
+    }
+    .info-list li:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+    .info-label {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        color: var(--text-slate);
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        display: block;
+        margin-bottom: 6px;
+    }
+    .info-value {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: var(--text-dark);
+        word-break: break-word;
+    }
+    
+    .skills-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    .skill-pill {
+        background: linear-gradient(135deg, rgba(0, 180, 216, 0.1), rgba(0, 229, 255, 0.1));
+        color: var(--color-primary-blue);
+        border: 1px solid rgba(0, 180, 216, 0.3);
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        box-shadow: 0 2px 8px rgba(0, 180, 216, 0.05);
+    }
+    .verified-badge-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px;
+        background: rgba(16, 185, 129, 0.1);
+        border: 1px solid rgba(16, 185, 129, 0.3);
+        border-radius: var(--radius-sm);
+        color: var(--success);
+        font-weight: 600;
+        font-size: 0.9rem;
+        margin-bottom: 12px;
+    }
+    .referral-tracker {
+        background: rgba(0, 59, 143, 0.05);
+        padding: 16px;
+        border-radius: var(--radius-sm);
+        border: 1px solid rgba(0, 59, 143, 0.15);
+        text-align: center;
+    }
+
+    /* Right Wide Column: Tabs */
+    .tabs-header {
+        display: flex;
+        gap: 32px;
+        border-bottom: 1px solid var(--glass-border);
+        padding-bottom: 8px;
+        overflow-x: auto;
+        scrollbar-width: none;
+    }
+    .tabs-header::-webkit-scrollbar { display: none; }
+    
+    .tab-btn {
+        background: none;
+        border: none;
+        padding: 12px 0;
+        font-size: 1.05rem;
+        font-weight: 600;
+        color: var(--text-slate);
+        cursor: pointer;
+        position: relative;
+        white-space: nowrap;
+        transition: color 0.3s;
+    }
+    .tab-btn:hover { color: var(--text-dark); }
+    .tab-btn.active { color: var(--color-primary-blue); font-weight: 700; }
+    .tab-btn.active::after {
+        content: '';
+        position: absolute;
+        bottom: -9px;
+        left: 0;
+        width: 100%;
+        height: 3px;
+        background: var(--color-accent-cyan);
+        border-radius: 3px 3px 0 0;
+        box-shadow: 0 -2px 8px rgba(0, 180, 216, 0.4);
+    }
+
+    .tab-content { display: none; animation: fadeIn 0.4s ease; }
+    .tab-content.active { display: block; }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(15px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* FIX: Breakproof Contribution Score Hub Matrix */
+    .metrics-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 16px;
+        width: 100%;
+    }
+
+    .metric-card {
+        background: rgba(255, 255, 255, 0.7);
+        border: 1px solid var(--glass-border);
+        border-radius: var(--radius-md);
+        padding: 24px 16px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+    }
+    .metric-card:hover {
+        background: rgba(255, 255, 255, 0.95);
+        transform: translateY(-6px);
+        box-shadow: 0 12px 24px rgba(0, 59, 143, 0.1);
+        border-color: var(--color-accent-cyan);
+    }
+    .metric-value {
+        font-size: 2.8rem;
+        color: var(--color-primary-blue);
+        margin-bottom: 8px;
+        line-height: 1;
+        text-shadow: 0 4px 12px rgba(0, 59, 143, 0.1);
+    }
+    .metric-label {
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: var(--text-slate);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    /* Timeline Log */
+    .timeline-log-box {
+        padding: 40px; 
+        text-align: center; 
+        color: var(--text-slate); 
+        background: rgba(255,255,255,0.4); 
+        border-radius: var(--radius-sm); 
+        border: 1px dashed var(--glass-border);
+    }
+
+    /* Forms */
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    @media(min-width: 768px) {
+        .form-grid { grid-template-columns: 1fr 1fr; }
+    }
+    .form-group { display: flex; flex-direction: column; gap: 8px; }
+    .form-group.full-width { grid-column: 1 / -1; }
+    
+    .form-label {
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: var(--text-dark);
+    }
+    .form-input, .form-textarea, .form-select {
+        width: 100%;
+        padding: 14px 16px;
+        background: rgba(255, 255, 255, 0.75);
+        border: 1px solid var(--glass-border);
+        border-radius: var(--radius-sm);
+        font-size: 0.95rem;
+        font-weight: 500;
+        color: var(--text-dark);
+        outline: none;
+        transition: all 0.3s ease;
+        box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+    }
+    .form-input:focus, .form-textarea:focus, .form-select:focus {
+        background: #ffffff;
+        border-color: var(--color-accent-cyan);
+        box-shadow: 0 0 0 4px rgba(0, 180, 216, 0.15);
+    }
+    .form-textarea { resize: vertical; min-height: 120px; }
+
+    .btn-primary {
+        background: linear-gradient(135deg, var(--color-primary-blue), var(--color-accent-cyan));
+        color: white;
+        border: none;
+        padding: 14px 28px;
+        border-radius: var(--radius-sm);
+        font-weight: 700;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 6px 16px rgba(0, 59, 143, 0.2);
+        letter-spacing: 0.5px;
+    }
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(0, 59, 143, 0.3);
+    }
+    .btn-primary:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
+    
+    .btn-danger {
+        background: rgba(239, 68, 68, 0.1);
+        color: var(--error);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        padding: 10px 18px;
+        border-radius: var(--radius-sm);
+        font-size: 0.85rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        white-space: nowrap;
+    }
+    .btn-danger:hover {
+        background: var(--error);
+        color: white;
+        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+    }
+
+    /* 
+    ========================================
+    CRADLE MODALS (Dynamic CRUD Managers)
+    ========================================
+    */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(15, 23, 42, 0.6);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        z-index: 3000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+        padding: 20px;
+    }
+    .modal-overlay.active {
+        opacity: 1;
+        pointer-events: all;
+    }
+    .modal-container {
+        width: 100%;
+        max-width: 700px;
+        max-height: 90vh;
+        overflow-y: auto;
+        padding: 32px;
+        transform: translateY(30px) scale(0.95);
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .modal-overlay.active .modal-container {
+        transform: translateY(0) scale(1);
+    }
+    .modal-container::-webkit-scrollbar { width: 6px; }
+    .modal-container::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.2); border-radius: 10px; }
+
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 32px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid rgba(0,0,0,0.1);
+    }
+    .modal-title {
+        font-size: 1.6rem;
+        font-weight: 800;
+        color: var(--color-primary-blue);
+        letter-spacing: -0.5px;
+    }
+    .close-modal-btn {
+        background: rgba(0,0,0,0.05);
+        border: none;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        font-size: 1.5rem;
+        color: var(--text-dark);
+        cursor: pointer;
+        transition: background 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .close-modal-btn:hover { background: rgba(0,0,0,0.1); color: var(--error); }
+    
+    .crud-section { margin-bottom: 40px; }
+    .crud-section:last-child { margin-bottom: 0; }
+    .crud-section h4 {
+        margin-bottom: 20px;
+        color: var(--text-dark);
+        font-weight: 800;
+        font-size: 1.15rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .crud-list {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+    .crud-item {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        background: rgba(255, 255, 255, 0.7);
+        padding: 20px;
+        border-radius: var(--radius-sm);
+        border: 1px solid var(--glass-border);
+        box-shadow: 0 4px 16px rgba(0,0,0,0.03);
+    }
+    @media(min-width: 500px) {
+        .crud-item { flex-direction: row; justify-content: space-between; align-items: center; }
+    }
+    .crud-item-details strong {
+        display: block;
+        color: var(--color-primary-blue);
+        font-size: 1.1rem;
+        font-weight: 700;
+        margin-bottom: 6px;
+    }
+    .crud-item-details span {
+        font-size: 0.9rem;
+        color: var(--text-slate);
+        font-family: 'JetBrains Mono', monospace;
+    }
+    
+    .modal-body { display: none; }
+    .modal-body.active { display: block; animation: fadeIn 0.3s ease; }
+
+    /* 
+    ========================================
+    FULLSCREEN LOADING MASK
+    ========================================
+    */
+    #profile-shield-loader {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: var(--bg-balanced-canvas);
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .spinner {
+        width: 60px;
+        height: 60px;
+        border: 4px solid rgba(0, 59, 143, 0.1);
+        border-left-color: var(--color-primary-blue);
+        border-radius: 50%;
+        animation: spin 1s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+        margin-bottom: 24px;
+    }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+
+    /* Toast Container */
+    .toast-container {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        z-index: 4000;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        pointer-events: none;
+    }
+    .toast {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border-left: 4px solid var(--success);
+        padding: 16px 24px;
+        border-radius: var(--radius-sm);
+        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        font-weight: 600;
+        color: var(--text-dark);
+        font-size: 0.95rem;
+        opacity: 0;
+        transform: translateX(50px);
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .toast.show { opacity: 1; transform: translateX(0); }
+    .toast.error { border-left-color: var(--error); }
+    .toast.warning { border-left-color: var(--warning); }
+</style>
+</head>
+<body>
+
+<!-- Loading Shield Screen -->
+<div id="profile-shield-loader">
+    <div class="spinner"></div>
+    <div style="font-weight: 800; font-size: 1.15rem; color: var(--color-primary-blue); letter-spacing: 0.5px;">Authenticating Identity Matrix...</div>
+</div>
+
+<!-- Layer 1: OMNIPRESENT FLOATING HEADER BAR -->
+<header class="global-header">
+    <a href="dashboard.html" class="brand-logo">Tattva Nexus</a>
+    <div class="header-controls">
+        <span class="page-title-label">User Profile</span>
+        <input type="text" class="search-input" placeholder="Search resources...">
+        <button class="bell-btn" aria-label="Notifications">🔔</button>
+        <div class="user-role-badge" id="user-role-badge">Verifying...</div>
+        <div class="header-avatar" id="header-avatar">?</div>
+    </div>
+</header>
+
+<!-- Layer 2: SIDEBAR NAVIGATION -->
+<aside class="sidebar">
+    <a href="dashboard.html" class="nav-item"><span>📊</span> Dashboard</a>
+    <a href="gigs.html" class="nav-item"><span>💼</span> Gigs</a>
+    <a href="notes.html" class="nav-item"><span>📚</span> Notes</a>
+    <a href="marketplace.html" class="nav-item"><span>🛒</span> Marketplace</a>
+    <a href="events.html" class="nav-item"><span>📅</span> Events</a>
+    <a href="community.html" class="nav-item"><span>👥</span> Community</a>
+    <a href="messages.html" class="nav-item"><span>💬</span> Messages</a>
+    <a href="profile.html" class="nav-item active"><span>👤</span> Profile</a>
+    <a href="#" class="nav-item nav-logout" id="logout-btn"><span>🚪</span> Logout Securely</a>
+</aside>
+
+<!-- Layer 2: MAIN DETAILS SPACE -->
+<main class="main-content">
+    
+    <!-- Hero Banner & Typography Block -->
+    <div class="hero-banner-block">
+        <div class="hero-banner-bg"></div>
+        <div class="neel-athane-block">
+            <div class="profile-avatar-large" id="main-avatar">?</div>
+            <div class="profile-typography">
+                <h1 id="display-fullname">Loading Core Data...</h1>
+                <p id="dept-text">Awaiting Department Sync...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- LOWER SPLIT WORKSPACE GRID (1fr 2fr) -->
+    <div class="workspace-grid">
+        
+        <!-- Left Narrow Column Canvas (1fr) Stack -->
+        <div class="left-stack">
+            <!-- About Me Block -->
+            <div class="content-card glass-panel">
+                <h3 class="card-title">📖 Identity Overview</h3>
+                <p id="bio-text-box" class="bio-text">Loading secure biography profile...</p>
+                <ul class="info-list">
+                    <li>
+                        <span class="info-label">Full Name Node</span>
+                        <span class="info-value" id="info-name">...</span>
+                    </li>
+                    <li>
+                        <span class="info-label">Registered Mail Alias</span>
+                        <span class="info-value" id="info-email">...</span>
+                    </li>
+                    <li>
+                        <span class="info-label">Contact Endpoint</span>
+                        <span class="info-value" id="info-phone">...</span>
+                    </li>
+                    <li>
+                        <span class="info-label">Graduation Target</span>
+                        <span class="info-value" id="info-grad">...</span>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Skills Capsule Pill Tray -->
+            <div class="content-card glass-panel">
+                <h3 class="card-title">🎯 Technical Competencies</h3>
+                <div class="skills-container" id="display-skills">
+                    <span class="skill-pill" style="opacity:0.6;">Fetching capability nodes...</span>
+                </div>
+            </div>
+
+            <!-- Verified Badges Display Case -->
+            <div class="content-card glass-panel">
+                <h3 class="card-title">🛡️ Security Clearances</h3>
+                <div class="verified-badge-item">
+                    <span>✔️</span> Identity Verified
+                </div>
+                <div class="verified-badge-item" style="background: rgba(0, 180, 216, 0.1); border-color: rgba(0, 180, 216, 0.3); color: var(--color-primary-blue);">
+                    <span>🌐</span> Active Cloud Node
+                </div>
+            </div>
+
+            <!-- Referral Rewards Tracker Block -->
+            <div class="content-card glass-panel">
+                <h3 class="card-title">🎁 Network Referrals</h3>
+                <div class="referral-tracker">
+                    <div class="mono-metric" style="font-size: 2rem; color: var(--color-accent-cyan); margin-bottom: 8px;">03</div>
+                    <div style="font-size: 0.85rem; color: var(--text-slate); font-weight: 600;">Successful Invites</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Wide Column Canvas (2fr) Stack -->
+        <div class="right-stack">
+            
+            <!-- Active Tab Selectors -->
+            <div class="tabs-header">
+                <button class="tab-btn active" onclick="switchTab('activity')" id="btn-activity">Recent Activity Hub</button>
+                <button class="tab-btn" onclick="switchTab('settings')" id="btn-settings">Account Settings</button>
+            </div>
+
+            <!-- Tab 1: Contribution Score Hub Matrix -->
+            <div id="tab-activity" class="tab-content active">
+                <div class="content-card glass-panel">
+                    <h3 class="card-title">📈 System Contribution Matrix</h3>
+                    <p style="color: var(--text-slate); font-size: 0.95rem; margin-bottom: 24px; line-height: 1.5;">Click any dynamic metric module block to interface directly with your live cloud object registries.</p>
+                    
+                    <!-- Breakproof Responsive CSS Grid Matrix -->
+                    <div class="metrics-grid">
+                        <div class="metric-card" onclick="openModal('notes')">
+                            <div class="metric-value mono-metric" id="notes-count">00</div>
+                            <div class="metric-label">Notes Posted</div>
+                        </div>
+                        <div class="metric-card" onclick="openModal('gigs')">
+                            <div class="metric-value mono-metric" id="metric-gigs">00</div>
+                            <div class="metric-label">Gigs Posted</div>
+                        </div>
+                        <div class="metric-card" onclick="openModal('marketplace')">
+                            <div class="metric-value mono-metric" id="metric-market">00</div>
+                            <div class="metric-label">Products Listed</div>
+                        </div>
+                        <div class="metric-card" onclick="openModal('community')">
+                            <div class="metric-value mono-metric" id="metric-community">00</div>
+                            <div class="metric-label">Forum Threads</div>
+                        </div>
+                        <div class="metric-card" style="cursor: default; opacity: 0.7;">
+                            <div class="metric-value mono-metric" id="sessions-count">00</div>
+                            <div class="metric-label">Sessions Comp.</div>
+                        </div>
+                        <div class="metric-card" style="cursor: default; opacity: 0.7;">
+                            <div class="metric-value mono-metric" id="metric-events">00</div>
+                            <div class="metric-label">Events Attended</div>
+                        </div>
+                        <div class="metric-card" style="cursor: default; opacity: 0.7; grid-column: 1 / -1;">
+                            <div class="metric-value mono-metric" id="metric-reviews">00</div>
+                            <div class="metric-label">Earned Rating Reviews</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Activity Timeline Node Stream -->
+                <div class="content-card glass-panel">
+                    <h3 class="card-title">⏱️ Activity Timeline Protocol</h3>
+                    <div class="timeline-log-box mono-metric">
+                        [ SYSTEM_LOG: No recent event nodes detected in chronological registry ]
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 2: Account Settings Form -->
+            <div id="tab-settings" class="tab-content">
+                <div class="content-card glass-panel">
+                    <h3 class="card-title">⚙️ Update Global Identity Parameters</h3>
+                    <form id="settings-form">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label" for="first-name-input">First Name</label>
+                                <input type="text" id="first-name-input" class="form-input" required placeholder="User">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="last-name-input">Last Name</label>
+                                <input type="text" id="last-name-input" class="form-input" required placeholder="Name">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="edit-phone">Contact Endpoint Number</label>
+                                <input type="tel" id="edit-phone" class="form-input" placeholder="+91 XXXXX XXXXX">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="edit-grad">Target Graduation</label>
+                                <select id="edit-grad" class="form-select">
+                                    <option value="2024">Class of 2024</option>
+                                    <option value="2025">Class of 2025</option>
+                                    <option value="2026">Class of 2026</option>
+                                    <option value="2027">Class of 2027</option>
+                                    <option value="2028">Class of 2028</option>
+                                </select>
+                            </div>
+                            <div class="form-group full-width">
+                                <label class="form-label" for="edit-major">Academic Department / Specialization</label>
+                                <input type="text" id="edit-major" class="form-input" placeholder="e.g. Electronics and Communication (AI/ML)">
+                            </div>
+                            <div class="form-group full-width">
+                                <label class="form-label" for="edit-skills">Technical Array Capabilities (Comma separated)</label>
+                                <input type="text" id="edit-skills" class="form-input" placeholder="Python, React Native, UI/UX Design, Firebase">
+                            </div>
+                            <div class="form-group full-width">
+                                <label class="form-label" for="edit-bio">Professional System Biography</label>
+                                <textarea id="edit-bio" class="form-textarea" placeholder="Detail your academic architecture, endpoints, and background logic..."></textarea>
+                            </div>
+                            <div class="form-group full-width" style="margin-top: 16px; display: flex; justify-content: flex-end;">
+                                <button type="submit" class="btn-primary" id="save-settings-btn">Commit Atomic Update</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</main>
+
+<!-- MULTI-MODULE IN-PAGE DYNAMIC CRUD MODAL MANAGERS -->
+<div class="modal-overlay" id="management-modal">
+    <div class="modal-container glass-panel">
+        <div class="modal-header">
+            <div class="modal-title" id="modal-title-text">Management Interface</div>
+            <button class="close-modal-btn" onclick="closeModal()">×</button>
+        </div>
+
+        <!-- CRUD Body: Notes Pool -->
+        <div id="modal-notes" class="modal-body">
+            <div class="crud-section">
+                <h4>➕ Append New Note Document</h4>
+                <form id="add-note-form" class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">Note Asset Title</label>
+                        <input type="text" id="note-title" class="form-input" required placeholder="e.g. Advanced OS Principles">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Academic Course Code</label>
+                        <input type="text" id="note-course" class="form-input" required placeholder="CS304">
+                    </div>
+                    <div class="form-group full-width">
+                        <button type="submit" class="btn-primary">Upload to Cloud Pool</button>
+                    </div>
+                </form>
+            </div>
+            <div class="crud-section">
+                <h4>🗄️ Your Deployed Cloud Notes</h4>
+                <div class="crud-list" id="list-notes"></div>
+            </div>
+        </div>
+
+        <!-- CRUD Body: Gigs Pipeline -->
+        <div id="modal-gigs" class="modal-body">
+            <div class="crud-section">
+                <h4>➕ Initialize Gig Contract Pipeline</h4>
+                <form id="add-gig-form" class="form-grid">
+                    <div class="form-group full-width">
+                        <label class="form-label">Gig Objective Directive</label>
+                        <input type="text" id="gig-title" class="form-input" required placeholder="e.g. Need embedded systems architect">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Capital Allocation (₹)</label>
+                        <input type="number" id="gig-budget" class="form-input" required placeholder="2500">
+                    </div>
+                    <div class="form-group full-width">
+                        <button type="submit" class="btn-primary">Broadcast Contract Request</button>
+                    </div>
+                </form>
+            </div>
+            <div class="crud-section">
+                <h4>📡 Your Active Broadcasting Gigs</h4>
+                <div class="crud-list" id="list-gigs"></div>
+            </div>
+        </div>
+
+        <!-- CRUD Body: Marketplace Hardware -->
+        <div id="modal-marketplace" class="modal-body">
+            <div class="crud-section">
+                <h4>➕ Deploy Hardware Asset Listing</h4>
+                <form id="add-market-form" class="form-grid">
+                    <div class="form-group full-width">
+                        <label class="form-label">Hardware Nomenclature</label>
+                        <input type="text" id="market-title" class="form-input" required placeholder="e.g. Raspberry Pi 4 Model B">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Asset Valuation (₹)</label>
+                        <input type="number" id="market-price" class="form-input" required placeholder="4500">
+                    </div>
+                    <div class="form-group full-width">
+                        <button type="submit" class="btn-primary">Inject Listing to Market</button>
+                    </div>
+                </form>
+            </div>
+            <div class="crud-section">
+                <h4>📦 Your Listed Hardware Assets</h4>
+                <div class="crud-list" id="list-marketplace"></div>
+            </div>
+        </div>
+
+        <!-- CRUD Body: Community Threads -->
+        <div id="modal-community" class="modal-body">
+            <div class="crud-section">
+                <h4>➕ Spin Up New Discussion Thread</h4>
+                <form id="add-community-form" class="form-grid">
+                    <div class="form-group full-width">
+                        <label class="form-label">Thread Protocol Subject</label>
+                        <input type="text" id="comm-title" class="form-input" required placeholder="e.g. Machine Learning algorithms tier list?">
+                    </div>
+                    <div class="form-group full-width">
+                        <button type="submit" class="btn-primary">Transmit Open Protocol</button>
+                    </div>
+                </form>
+            </div>
+            <div class="crud-section">
+                <h4>💬 Your Deployed System Threads</h4>
+                <div class="crud-list" id="list-community"></div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Dynamic Toast Notification Container -->
+<div class="toast-container" id="toast-area"></div>
+
+<!-- ==========================================
+     FAILSAFE FIREBASE SYSTEM & DATA LOGIC 
+     ========================================== -->
+<script type="module">
+    const IS_DEV_MODE = true;
+
+    // Strict Firebase SDK Component Imports
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { 
+        getFirestore, doc, getDoc, setDoc, updateDoc,
+        collection, query, where, getDocs, addDoc, deleteDoc, getCountFromServer 
+    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    // Required System Configuration Map (Placeholder)
+    const firebaseConfig = {
+        apiKey: "AIzaSyCLo9rfV279AoHGGs3HheHgYQ5EgLcCzJo",
+        authDomain: "tattva-nexus.firebaseapp.com",
+        projectId: "tattva-nexus",
+        storageBucket: "tattva-nexus.firebasestorage.app",
+        messagingSenderId: "275334528",
+        appId: "1:275334528:web:48a4d050fdb91c1c142d65"
+    };
+
+    // Instantiate System Core
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // Toast Alert Engine
+    window.showToast = function(message, type = 'success') {
+        const container = document.getElementById('toast-area');
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        toast.innerText = message;
+        container.appendChild(toast);
+        
+        // Force DOM reflow to trigger CSS entry transition
+        void toast.offsetWidth; 
+        
+        toast.classList.add('show');
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => toast.remove(), 400); // Wait for exit animation
+        }, 3500);
+    };
+
+    // Tab Interface Toggle Logic
+    window.switchTab = function(tabId) {
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+        document.getElementById(`btn-${tabId}`).classList.add('active');
+        document.getElementById(`tab-${tabId}`).classList.add('active');
+    };
+
+    // Modal Lifecycle Controller
+    window.openModal = function(type) {
+        const modal = document.getElementById('management-modal');
+        modal.classList.add('active');
+        
+        document.querySelectorAll('.modal-body').forEach(body => body.classList.remove('active'));
+        document.getElementById(`modal-${type}`).classList.add('active');
+        
+        // Contextual Header Re-assignment
+        const titles = {
+            'notes': 'Cloud Notes Data Manager',
+            'gigs': 'Contract Pipeline Admin',
+            'marketplace': 'Marketplace Listing Authority',
+            'community': 'Thread Protocol Supervisor'
+        };
+        document.getElementById('modal-title-text').innerText = titles[type];
+        
+        // Execute Cloud Query Sequence
+        fetchModalData(type);
+    };
+    
+    window.closeModal = function() {
+        document.getElementById('management-modal').classList.remove('active');
+    };
+
+    // Subsystem: Authentication & Live Data Retrieval Guardrails
+    onAuthStateChanged(auth, async (user) => {
+        if (!user) {
+            // Session Verification Gate Failsafe
+            window.location.href = "login.html";
+            return;
+        }
+
+        try {
+            const userRef = doc(db, "users", user.uid);
+            const userSnap = await getDoc(userRef);
+            let userData = {};
+
+            if (userSnap.exists()) {
+                userData = userSnap.data();
+            } else {
+                // Instantiating secure default construct for missing profile doc
+                userData = { email: user.email, isCollegeVerified: false };
+            }
+
+            populateProfileUI(user, userData);
+            await loadCoreMetrics(user.uid);
+
+        } catch (error) {
+            console.error("Profile Subsystem Error:", error);
+            showToast("Failed to compile user mapping parameters", "error");
+        } finally {
+            // Unmount Loading Mesh Overlay
+            const loader = document.getElementById('profile-shield-loader');
+            loader.style.opacity = "0";
+            setTimeout(() => { loader.style.display = "none"; }, 600);
+        }
+    });
+
+    // Subsystem: Null Guardrails (Prevent Loading Freezes)
+    function populateProfileUI(user, data) {
+        // String Fallbacks
+        const fname = data.firstName || '';
+        const lname = data.lastName || '';
+        const fullName = (fname + " " + lname).trim() || user.email.split('@')[0];
+        const initial = fullName.charAt(0).toUpperCase();
+        
+        const departmentString = data.department || data.major || 'Electronics and Communication (AI/ML)';
+        const emailString = data.collegeEmail || user.email;
+        const phoneString = data.phone || 'Endpoint Unspecified';
+        const gradTarget = data.gradYear || '2025';
+        const bioText = data.bio || 'Enter profile bio details...';
+        
+        // Array Safeguarding Pattern
+        const skillsRaw = data.skills || "";
+        const skillsArray = skillsRaw.split(',').map(s => s.trim()).filter(s => s.length > 0);
+
+        // Dynamic Role Verification Check
+        const roleBadge = document.getElementById('user-role-badge');
+        if (data.collegeEmail && data.isCollegeVerified === true) {
+            roleBadge.innerText = "Verified Student";
+            roleBadge.className = "user-role-badge verified-student-badge";
+        } else {
+            roleBadge.innerText = "Community Member";
+            roleBadge.className = "user-role-badge community-member-badge";
+        }
+
+        // Apply Graphic Token Initializers
+        document.getElementById('header-avatar').innerText = initial;
+        document.getElementById('main-avatar').innerText = initial;
+        
+        // Bind Typography Element Trees
+        document.getElementById('display-fullname').innerText = fullName;
+        document.getElementById('dept-text').innerText = departmentString;
+        document.getElementById('info-name').innerText = fullName;
+        document.getElementById('info-email').innerText = emailString;
+        document.getElementById('info-phone').innerText = phoneString;
+        document.getElementById('info-grad').innerText = gradTarget;
+        document.getElementById('bio-text-box').innerText = bioText;
+
+        // Static Default Counters (per exact requested IDs)
+        document.getElementById('sessions-count').innerText = (data.sessionsCompleted || 0).toString().padStart(2, '0');
+        document.getElementById('metric-reviews').innerText = (data.earnedReviews || 0).toString().padStart(2, '0');
+
+        // Compile Skills DOM Node Array
+        const skillsContainer = document.getElementById('display-skills');
+        skillsContainer.innerHTML = '';
+        if (skillsArray.length > 0) {
+            skillsArray.forEach(skillPill => {
+                const spanNode = document.createElement('span');
+                spanNode.className = 'skill-pill';
+                spanNode.innerText = skillPill;
+                skillsContainer.appendChild(spanNode);
+            });
+        } else {
+            skillsContainer.innerHTML = '<span class="skill-pill" style="opacity:0.5; border-style:dashed;">Awaiting Array Population</span>';
+        }
+
+        // Form Value Injectors matching requested exact target IDs
+        document.getElementById('first-name-input').value = fname;
+        document.getElementById('last-name-input').value = lname;
+        document.getElementById('edit-phone').value = data.phone || "";
+        document.getElementById('edit-major').value = data.department || data.major || "";
+        document.getElementById('edit-grad').value = data.gradYear || "2025";
+        document.getElementById('edit-skills').value = skillsRaw;
+        document.getElementById('edit-bio').value = data.bio || "";
+    }
+
+    // Advanced Cloud Count Compilation Logic 
+    async function loadCoreMetrics(uid) {
+        // Encapsulate queries so a missing collection does not crash page render loops
+        const executeSafeCloudCount = async (collName, searchField) => {
+            try {
+                const queryRef = query(collection(db, collName), where(searchField, '==', uid));
+                const counterSnap = await getCountFromServer(queryRef);
+                return counterSnap.data().count;
+            } catch (err) {
+                if(IS_DEV_MODE) console.warn(`Bypassed structural count fail for [${collName}]:`, err.message);
+                return 0; // Absolute zero failsafe
+            }
+        };
+
+        const notesTotal = await executeSafeCloudCount('notes', 'authorUid');
+        const gigsTotal = await executeSafeCloudCount('gigs', 'authorUid');
+        const marketTotal = await executeSafeCloudCount('marketplace', 'sellerUid');
+        const commTotal = await executeSafeCloudCount('community', 'authorUid');
+
+        // Monospace padding structure format (i.e. '05')
+        const monoPad = (val) => String(val).padStart(2, '0');
+
+        document.getElementById('notes-count').innerText = monoPad(notesTotal);
+        document.getElementById('metric-gigs').innerText = monoPad(gigsTotal);
+        document.getElementById('metric-market').innerText = monoPad(marketTotal);
+        document.getElementById('metric-community').innerText = monoPad(commTotal);
+    }
+
+    // Subsystem: Atomic Update Commit Sequence
+    document.getElementById('settings-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const user = auth.currentUser;
+        if (!user) return;
+
+        const executeBtn = document.getElementById('save-settings-btn');
+        const oldText = executeBtn.innerText;
+        executeBtn.innerText = "Committing to Server...";
+        executeBtn.disabled = true;
+
+        const updatePayload = {
+            firstName: document.getElementById('first-name-input').value.trim(),
+            lastName: document.getElementById('last-name-input').value.trim(),
+            phone: document.getElementById('edit-phone').value.trim(),
+            department: document.getElementById('edit-major').value.trim(),
+            gradYear: document.getElementById('edit-grad').value,
+            skills: document.getElementById('edit-skills').value.trim(),
+            bio: document.getElementById('edit-bio').value.trim(),
+            lastModifiedStamp: new Date().toISOString()
+        };
+
+        try {
+            // Using setDoc with merge flag equivalent to robust updateDoc object patching
+            await setDoc(doc(db, "users", user.uid), updatePayload, { merge: true });
+            showToast("Global Identity parameters successfully updated in cloud");
+            
+            // Trigger automatic UI refresh array sequence
+            const newSnapshot = await getDoc(doc(db, "users", user.uid));
+            populateProfileUI(user, newSnapshot.data());
+            
+            setTimeout(() => switchTab('activity'), 700);
+        } catch (error) {
+            console.error("Atomic Update Failed:", error);
+            showToast("Commit operation rejected by cloud rules: " + error.message, "error");
+        } finally {
+            executeBtn.innerText = oldText;
+            executeBtn.disabled = false;
+        }
+    });
+
+    // ---------------------------------------------------------
+    // CRADLE MODALS: CLOUD CRUD MUTATION ENGINES
+    // ---------------------------------------------------------
+
+    // Read Logic Component
+    async function fetchModalData(modelType) {
+        const user = auth.currentUser;
+        if (!user) return;
+        
+        const listWrapperNode = document.getElementById(`list-${modelType}`);
+        listWrapperNode.innerHTML = '<div style="text-align:center; padding: 24px; font-family: \'JetBrains Mono\', monospace; color: var(--color-primary-blue);">Executing dimensional array query...</div>';
+
+        // Schema Routing Dictionary
+        const schemaRouter = {
+            'notes': { targetCol: 'notes', matchField: 'authorUid', headTitle: 'title', subContext: 'courseCode' },
+            'gigs': { targetCol: 'gigs', matchField: 'authorUid', headTitle: 'title', subContext: 'budget' },
+            'marketplace': { targetCol: 'marketplace', matchField: 'sellerUid', headTitle: 'productName', subContext: 'price' },
+            'community': { targetCol: 'community', matchField: 'authorUid', headTitle: 'subject', subContext: 'createdAt' }
+        };
+
+        const configTarget = schemaRouter[modelType];
+        
+        try {
+            const queryBlock = query(collection(db, configTarget.targetCol), where(configTarget.matchField, '==', user.uid));
+            const documentSnapshot = await getDocs(queryBlock);
+            
+            listWrapperNode.innerHTML = '';
+            
+            if (documentSnapshot.empty) {
+                listWrapperNode.innerHTML = '<div style="color: var(--text-slate); font-size: 0.95rem; text-align: center; padding: 24px; border: 1px dashed var(--glass-border); border-radius: var(--radius-sm); font-weight: 500;">No object records exist within this partition boundary.</div>';
+                return;
+            }
+
+            documentSnapshot.forEach(activeDoc => {
+                const nodeData = activeDoc.data();
+                const nodeDiv = document.createElement('div');
+                nodeDiv.className = 'crud-item';
+                
+                let stringSubData = nodeData[configTarget.subContext] || 'N/A';
+                
+                // Formatter Mapping Logic
+                if (modelType === 'gigs' || modelType === 'marketplace') {
+                    stringSubData = `Valuation Scale: ₹${stringSubData}`;
+                } else if (modelType === 'community') {
+                    const dateVal = new Date(stringSubData);
+                    stringSubData = isNaN(dateVal) ? 'Unknown Timestamp' : `Deployed: ${dateVal.toLocaleDateString()}`;
+                } else if (modelType === 'notes') {
+                    stringSubData = `Academic Hash: ${stringSubData}`;
+                }
+
+                nodeDiv.innerHTML = `
+                    <div class="crud-item-details">
+                        <strong>${nodeData[configTarget.headTitle] || 'Untitled Object Construct'}</strong>
+                        <span>${stringSubData}</span>
+                    </div>
+                    <button class="btn-danger" onclick="deleteRecord('${configTarget.targetCol}', '${activeDoc.id}', '${modelType}')">Remove Object Node</button>
+                `;
+                listWrapperNode.appendChild(nodeDiv);
+            });
+        } catch (error) {
+            console.error("Array Query Malfunction:", error);
+            listWrapperNode.innerHTML = `<div style="color: var(--error); padding: 16px; font-weight: 600; background: rgba(239, 68, 68, 0.1); border-radius: 8px;">Network query disrupted. Target database path might be uninitialized.</div>`;
+        }
+    }
+
+    // Write Logic Component Engine Builder
+    const constructAddMutation = (formNodeId, typeName, colName, payloadCompiler) => {
+        document.getElementById(formNodeId).addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const activeUser = auth.currentUser;
+            if(!activeUser) return;
+            
+            const btnReference = e.target.querySelector('button[type="submit"]');
+            const cachedBtnText = btnReference.innerText;
+            btnReference.disabled = true;
+            btnReference.innerText = "Transmitting to Ledger...";
+
+            try {
+                const constructedDoc = payloadCompiler(activeUser);
+                constructedDoc.createdAt = new Date().toISOString();
+                
+                await addDoc(collection(db, colName), constructedDoc);
+                
+                showToast(`Object successfully injected into [${colName}] cluster array`);
+                e.target.reset();
+                
+                // Re-execute queries to auto-update UI components immediately
+                fetchModalData(typeName);
+                loadCoreMetrics(activeUser.uid);
+            } catch (error) {
+                console.error("Mutation Error Protocol:", error);
+                showToast("System write access denied", "error");
+            } finally {
+                btnReference.disabled = false;
+                btnReference.innerText = cachedBtnText;
+            }
+        });
+    };
+
+    // Instantiate Notes Form Node
+    constructAddMutation('add-note-form', 'notes', 'notes', (user) => ({
+        authorUid: user.uid,
+        title: document.getElementById('note-title').value.trim(),
+        courseCode: document.getElementById('note-course').value.trim()
+    }));
+
+    // Instantiate Gigs Form Node
+    constructAddMutation('add-gig-form', 'gigs', 'gigs', (user) => ({
+        authorUid: user.uid,
+        title: document.getElementById('gig-title').value.trim(),
+        budget: Number(document.getElementById('gig-budget').value),
+        status: 'open-protocol'
+    }));
+
+    // Instantiate Marketplace Form Node
+    constructAddMutation('add-market-form', 'marketplace', 'marketplace', (user) => ({
+        sellerUid: user.uid,
+        productName: document.getElementById('market-title').value.trim(),
+        price: Number(document.getElementById('market-price').value),
+        status: 'available-for-trade'
+    }));
+
+    // Instantiate Community Form Node
+    constructAddMutation('add-community-form', 'community', 'community', (user) => ({
+        authorUid: user.uid,
+        subject: document.getElementById('comm-title').value.trim(),
+        commentsCount: 0
+    }));
+
+    // Universal Cloud Object Deletion Mutation Array
+    window.deleteRecord = async function(colTarget, docIdCode, refreshType) {
+        if (!confirm("CRITICAL WARNING: Are you entirely certain you wish to permanently purge this object construct from the cloud memory register?")) return;
+        
+        try {
+            await deleteDoc(doc(db, colTarget, docIdCode));
+            showToast("Record construct successfully erased from server cache");
+            fetchModalData(refreshType);
+            loadCoreMetrics(auth.currentUser.uid);
+        } catch (error) {
+            console.error("Erase Mutation Array Failure:", error);
+            showToast("Purge request sequence denied", "error");
+        }
+    };
+
+    // Global Logout Termination Sequence
+    document.getElementById('logout-btn').addEventListener('click', (e) => {
+        e.preventDefault();
+        signOut(auth).then(() => {
+            window.location.href = "login.html";
+        }).catch((error) => {
+            showToast("Secure session termination interrupted", "error");
+        });
+    });
+
+</script>
+</body>
+</html>

@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Tattva Nexus - Secure Access</title>
+    <!-- Core & Monospace Typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* ==========================================================================
+           GLOBAL & HIGH-FIDELITY LIGHT-THEME SYSTEM
+           ========================================================================== */
+        :root {
+            /* Light Theme Palette */
+            --bg-base: #f9fafb;
+            --brand-teal: #0fa391;
+            --brand-teal-hover: #0d8c7c;
+            --brand-dark: #09201a;
+            
+            /* Text Hierarchy */
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --text-inverse: #ffffff;
+            
+            /* Apple/Vercel Frosted Glass Variables */
+            --glass-bg: rgba(255, 255, 255, 0.45);
+            --glass-border: rgba(255, 255, 255, 0.75);
+            --input-bg: rgba(255, 255, 255, 0.6);
+            --input-border: rgba(203, 213, 225, 0.6);
+            
+            /* Status / System Colors */
+            --error-color: #ef4444;
+            --error-bg: rgba(239, 68, 68, 0.08);
+            --success-color: #10b981;
+            --success-bg: rgba(16, 185, 129, 0.08);
+            
+            /* Physics Engine */
+            --anim-snappy: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            --shadow-glass: 0 4px 12px rgba(9, 32, 26, 0.02),
+                            0 16px 32px rgba(9, 32, 26, 0.04),
+                            0 32px 64px rgba(9, 32, 26, 0.05),
+                            0 0 40px rgba(15, 163, 145, 0.06);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', -apple-system, sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Canvas & Mesh Gradient */
+        body {
+            background-color: var(--bg-base);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            width: 80vw;
+            height: 80vw;
+            border-radius: 50%;
+            background: var(--brand-teal);
+            filter: blur(140px);
+            opacity: 0.07;
+            top: -20vh;
+            right: -20vw;
+            pointer-events: none;
+            z-index: -1;
+            animation: breathe 12s ease-in-out infinite alternate;
+        }
+
+        @keyframes breathe {
+            0% { transform: scale(1) translate(0, 0); }
+            100% { transform: scale(1.1) translate(-5%, 5%); }
+        }
+
+        /* FinTech Monospace Metrics */
+        .mono-num {
+            font-family: 'JetBrains Mono', 'SF Mono', monospace;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* ==========================================================================
+           MOBILE-FIRST LAYOUT ARCHITECTURE
+           ========================================================================== */
+        .split-container {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            min-height: 100vh;
+            z-index: 1;
+        }
+
+        /* Branding Banner (Top on Mobile, Left on Desktop) */
+        .brand-banner {
+            background: linear-gradient(135deg, #0f172a 0%, var(--brand-dark) 100%);
+            color: var(--text-inverse);
+            padding: 3rem 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .brand-banner::before {
+            content: '';
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(15,163,145,0.2) 0%, rgba(0,0,0,0) 70%);
+            top: -100px;
+            left: -100px;
+            pointer-events: none;
+        }
+
+        .logo-wrap {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            letter-spacing: -0.5px;
+            z-index: 2;
+        }
+
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: var(--brand-teal);
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: 800;
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(15, 163, 145, 0.4);
+        }
+
+        .brand-banner h1 {
+            font-size: 2.2rem;
+            line-height: 1.15;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            z-index: 2;
+            letter-spacing: -1px;
+        }
+
+        .brand-banner p {
+            color: #cbd5e1;
+            font-size: 1.05rem;
+            line-height: 1.6;
+            z-index: 2;
+            max-width: 400px;
+        }
+
+        /* Workspace Container (Bottom on Mobile, Right on Desktop) */
+        .workspace {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1.2rem;
+            width: 100%;
+        }
+
+        /* Premium Apple/Vercel Light Glass Panel */
+        .glass-panel {
+            width: 100%;
+            max-width: 480px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(24px) saturate(140%);
+            -webkit-backdrop-filter: blur(24px) saturate(140%);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 2.5rem 2rem;
+            box-shadow: var(--shadow-glass);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* ==========================================================================
+           FORM ARCHITECTURE & MICRO-INTERACTIONS
+           ========================================================================== */
+        .view-section {
+            display: none;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: var(--anim-snappy);
+        }
+
+        .view-section.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+            animation: slideUpFade 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        @keyframes slideUpFade {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .view-header { margin-bottom: 25px; }
+        
+        .view-header h2 {
+            font-size: 1.7rem;
+            color: var(--text-main);
+            margin-bottom: 8px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        .view-header p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .input-group { margin-bottom: 20px; }
+
+        .input-group label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-control {
+            width: 100%;
+            background: var(--input-bg);
+            border: 1px solid var(--input-border);
+            border-radius: 12px;
+            padding: 14px 16px;
+            color: var(--text-main);
+            font-size: 0.95rem;
+            transition: var(--anim-snappy);
+            outline: none;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.01);
+        }
+
+        .form-control::placeholder { color: #94a3b8; }
+
+        .form-control:focus {
+            border-color: var(--brand-teal);
+            background: #ffffff;
+            box-shadow: 0 0 0 4px rgba(15, 163, 145, 0.1), inset 0 2px 4px rgba(0,0,0,0.01);
+        }
+
+        /* Buttons */
+        .btn-controls {
+            display: flex;
+            gap: 12px;
+            margin-top: 25px;
+        }
+
+        .btn {
+            padding: 15px 24px;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--anim-snappy);
+            outline: none;
+            border: none;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+        }
+
+        .btn:hover:not(:disabled) { transform: translateY(-1px); }
+        .btn:active:not(:disabled) { transform: translateY(0) scale(0.98); }
+
+        .btn-primary {
+            background: var(--brand-teal);
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(15, 163, 145, 0.25);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: var(--brand-teal-hover);
+            box-shadow: 0 6px 16px rgba(15, 163, 145, 0.35);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-main);
+            border: 1px solid rgba(0,0,0,0.1);
+            flex: 0.4;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(0,0,0,0.02);
+            border-color: rgba(0,0,0,0.2);
+        }
+
+        .btn:disabled {
+            background: rgba(0,0,0,0.05);
+            color: var(--text-muted);
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+
+        /* Google SSO Button */
+        .btn-google {
+            background: #ffffff;
+            color: var(--text-main);
+            border: 1px solid var(--input-border);
+            margin-top: 15px;
+            gap: 10px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+        }
+
+        .btn-google:hover {
+            border-color: rgba(0,0,0,0.2);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        /* Toggle Links & Dividers */
+        .toggle-link {
+            color: var(--brand-teal);
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: var(--anim-snappy);
+            font-size: 0.95rem;
+        }
+
+        .toggle-link:hover { color: var(--brand-teal-hover); text-decoration: underline; }
+
+        .auth-switch-text {
+            text-align: center;
+            margin-top: 25px;
+            font-size: 0.95rem;
+            color: var(--text-muted);
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 25px 0;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+
+        .divider::before, .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid var(--input-border);
+        }
+
+        .divider::before { margin-right: 15px; }
+        .divider::after { margin-left: 15px; }
+
+        /* ==========================================================================
+           WIZARD PROGRESS TRACKER (SIGNUP)
+           ========================================================================== */
+        .progress-indicator {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            position: relative;
+            padding: 0 10px;
+        }
+
+        .progress-indicator::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 20px;
+            right: 20px;
+            height: 2px;
+            background: rgba(0,0,0,0.06);
+            transform: translateY(-50%);
+            z-index: 0;
+        }
+
+        .progress-step {
+            position: relative;
+            z-index: 1;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #ffffff;
+            border: 2px solid rgba(0,0,0,0.08);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-muted);
+            transition: var(--anim-snappy);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+        }
+
+        .progress-step.active {
+            border-color: var(--brand-teal);
+            background: rgba(15, 163, 145, 0.1);
+            color: var(--brand-teal);
+            box-shadow: 0 0 0 4px rgba(15, 163, 145, 0.15);
+        }
+
+        .progress-step.completed {
+            border-color: var(--brand-teal);
+            background: var(--brand-teal);
+            color: #ffffff;
+        }
+
+        /* ==========================================================================
+           STATUS MESSAGING
+           ========================================================================== */
+        #status-message {
+            padding: 14px;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-align: center;
+            display: none;
+            animation: slideUpFade 0.3s ease forwards;
+        }
+
+        #status-message.error {
+            background: var(--error-bg);
+            color: var(--error-color);
+            border: 1px solid rgba(239,68,68,0.2);
+        }
+
+        #status-message.success {
+            background: var(--success-bg);
+            color: var(--success-color);
+            border: 1px solid rgba(16,185,129,0.2);
+        }
+
+        /* ==========================================================================
+           DESKTOP SPLIT-SCREEN UPGRADE
+           ========================================================================== */
+        @media (min-width: 992px) {
+            .split-container { flex-direction: row; }
+            .brand-banner {
+                flex: 1;
+                padding: 4rem;
+            }
+            .brand-banner h1 { font-size: 3.5rem; margin-bottom: 1.5rem; }
+            .brand-banner p { font-size: 1.2rem; }
+            .logo-wrap { font-size: 2rem; margin-bottom: 3rem; }
+            .logo-icon { width: 44px; height: 44px; font-size: 1.8rem; }
+            
+            .workspace {
+                flex: 1.2;
+                padding: 4rem;
+            }
+            .glass-panel { max-width: 500px; padding: 3rem; }
+            .form-row { display: flex; gap: 15px; }
+        }
+
+        @media (max-width: 991px) {
+            .form-row { display: flex; flex-direction: column; gap: 0; }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="split-container">
+        
+        <!-- LEFT/TOP PANE: BRANDING -->
+        <div class="brand-banner">
+            <div class="logo-wrap">
+                <div class="logo-icon">T</div>
+                Tattva Nexus
+            </div>
+            <h1>Unlock your campus ecosystem.</h1>
+            <p>Join the definitive platform for verified student networking, secure freelance gig matching, and collaborative project syndication.</p>
+        </div>
+
+        <!-- RIGHT/BOTTOM PANE: WORKSPACE -->
+        <div class="workspace">
+            <div class="glass-panel">
+                
+                <div id="status-message"></div>
+
+                <!-- ==========================================
+                     VIEW: LOGIN
+                     ========================================== -->
+                <div id="view-login" class="view-section active">
+                    <div class="view-header">
+                        <h2>Welcome Back</h2>
+                        <p>Enter your credentials to access the Nexus.</p>
+                    </div>
+
+                    <form id="loginForm">
+                        <div class="input-group">
+                            <label>Email Address</label>
+                            <input type="email" id="loginEmail" class="form-control" placeholder="student@university.edu" required>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label>
+                                Password
+                                <span class="toggle-link" style="font-size: 0.75rem;" onclick="switchView('view-forgot')">Forgot?</span>
+                            </label>
+                            <input type="password" id="loginPassword" class="form-control" placeholder="••••••••" required>
+                        </div>
+
+                        <button type="submit" id="btnLogin" class="btn btn-primary">Sign In</button>
+                    </form>
+
+                    <div class="divider">OR</div>
+
+                    <button type="button" id="btnGoogleLogin" class="btn btn-google">
+                        <svg width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+                        Continue with Google
+                    </button>
+
+                    <p class="auth-switch-text">
+                        Don't have an account? <span class="toggle-link" onclick="switchView('view-signup-1')">Sign Up</span>
+                    </p>
+                </div>
+
+                <!-- ==========================================
+                     VIEW: FORGOT PASSWORD
+                     ========================================== -->
+                <div id="view-forgot" class="view-section">
+                    <div class="view-header">
+                        <h2>Reset Password</h2>
+                        <p>Enter your email and we'll send a recovery link.</p>
+                    </div>
+
+                    <form id="forgotForm">
+                        <div class="input-group">
+                            <label>Email Address</label>
+                            <input type="email" id="forgotEmail" class="form-control" placeholder="student@university.edu" required>
+                        </div>
+                        <div class="btn-controls">
+                            <button type="button" class="btn btn-secondary" onclick="switchView('view-login')">Back</button>
+                            <button type="submit" id="btnForgot" class="btn btn-primary" style="flex: 1.5;">Send Link</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- ==========================================
+                     VIEW: REGISTRATION ENGINE (STEPS 1-3)
+                     ========================================== -->
+                <div id="signup-container" style="display: none;">
+                    
+                    <div class="progress-indicator">
+                        <div class="progress-step active mono-num" id="ind-1">1</div>
+                        <div class="progress-step mono-num" id="ind-2">2</div>
+                        <div class="progress-step mono-num" id="ind-3">3</div>
+                    </div>
+
+                    <form id="signupForm">
+                        
+                        <!-- Step 1: Personal Details -->
+                        <div id="view-signup-1" class="view-section active">
+                            <div class="view-header">
+                                <h2>Create Account</h2>
+                                <p>Initialize your identity profile.</p>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="input-group" style="flex: 1;">
+                                    <label>First Name</label>
+                                    <input type="text" id="regFirstName" class="form-control" placeholder="John" required>
+                                </div>
+                                <div class="input-group" style="flex: 1;">
+                                    <label>Last Name</label>
+                                    <input type="text" id="regLastName" class="form-control" placeholder="Doe" required>
+                                </div>
+                            </div>
+
+                            <div class="input-group">
+                                <label>College Email Address</label>
+                                <input type="email" id="regEmail" class="form-control" placeholder="student@university.edu" required>
+                            </div>
+
+                            <div class="input-group">
+                                <label>Password</label>
+                                <input type="password" id="regPassword" class="form-control" placeholder="••••••••" required minlength="6">
+                            </div>
+
+                            <button type="button" class="btn btn-primary" style="margin-top: 15px;" onclick="validateAndProceed(1, 2)">Next: College Info</button>
+
+                            <p class="auth-switch-text">
+                                Already have an account? <span class="toggle-link" onclick="switchView('view-login')">Log In</span>
+                            </p>
+                        </div>
+
+                        <!-- Step 2: College Info -->
+                        <div id="view-signup-2" class="view-section">
+                            <div class="view-header">
+                                <h2>Academic Details</h2>
+                                <p>Help us verify your campus network.</p>
+                            </div>
+
+                            <div class="input-group">
+                                <label>University / College Name</label>
+                                <input type="text" id="regCollege" class="form-control" placeholder="State University" required>
+                            </div>
+
+                            <div class="input-group">
+                                <label>Department / Major</label>
+                                <input type="text" id="regMajor" class="form-control" placeholder="Computer Science">
+                            </div>
+
+                            <div class="btn-controls">
+                                <button type="button" class="btn btn-secondary" onclick="setSignupStep(1)">Back</button>
+                                <button type="button" class="btn btn-primary" style="flex: 1.5;" onclick="validateAndProceed(2, 3)">Next: Quick Bio</button>
+                            </div>
+                        </div>
+
+                        <!-- Step 3: Profile Snippet -->
+                        <div id="view-signup-3" class="view-section">
+                            <div class="view-header">
+                                <h2>Final Touches</h2>
+                                <p>Set up your initial networking snippet.</p>
+                            </div>
+
+                            <div class="input-group">
+                                <label>Short Bio</label>
+                                <textarea id="regBio" class="form-control" rows="3" placeholder="Briefly describe your goals and interests..."></textarea>
+                            </div>
+
+                            <div class="input-group">
+                                <label>Core Skills (Comma Separated)</label>
+                                <input type="text" id="regSkills" class="form-control" placeholder="e.g., Python, Graphic Design, Data Entry">
+                            </div>
+
+                            <div class="btn-controls">
+                                <button type="button" class="btn btn-secondary" onclick="setSignupStep(2)">Back</button>
+                                <button type="submit" id="btnSignup" class="btn btn-primary" style="flex: 1.5;">Create Premium Account</button>
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- ==========================================================================
+         FIREBASE v9+ MODULAR LOGIC ENGINE
+         ========================================================================== -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { 
+            getAuth, 
+            signInWithEmailAndPassword, 
+            createUserWithEmailAndPassword, 
+            sendPasswordResetEmail,
+            GoogleAuthProvider,
+            signInWithPopup
+        } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        import { 
+            getFirestore, 
+            doc, 
+            setDoc, 
+            getDoc 
+        } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+        // DEV MODE TOGGLE (Set true to ease local testing)
+        const IS_DEV_MODE = true;
+
+        // 🛑 FIREBASE CONFIGURATION (Replace with Production Keys)
+        const firebaseConfig = {
+            apiKey: "AIzaSyCLo9rfV279AoHGGs3HheHgYQ5EgLcCzJo",
+            authDomain: "tattva-nexus.firebaseapp.com",
+            projectId: "tattva-nexus",
+            storageBucket: "tattva-nexus.firebasestorage.app",
+            messagingSenderId: "275334528",
+            appId: "1:275334528:web:48a4d050fdb91c1c142d65"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const googleProvider = new GoogleAuthProvider();
+
+        // ==========================================
+        // UI STATE MACHINE LOGIC
+        // ==========================================
+        const msgBox = document.getElementById('status-message');
+        const loginContainer = document.getElementById('view-login');
+        const forgotContainer = document.getElementById('view-forgot');
+        const signupContainer = document.getElementById('signup-container');
+        
+        // Expose to window for onclick inline handlers
+        window.switchView = function(targetId) {
+            hideMsg();
+            
+            // Reset all containers
+            loginContainer.classList.remove('active');
+            forgotContainer.classList.remove('active');
+            signupContainer.style.display = 'none';
+            
+            document.querySelectorAll('#signupForm .view-section').forEach(el => el.classList.remove('active'));
+
+            if (targetId === 'view-login') {
+                loginContainer.classList.add('active');
+            } else if (targetId === 'view-forgot') {
+                forgotContainer.classList.add('active');
+            } else if (targetId.startsWith('view-signup')) {
+                signupContainer.style.display = 'block';
+                document.getElementById('view-signup-1').classList.add('active');
+                setSignupStep(1);
+            }
+        };
+
+        window.validateAndProceed = function(current, target) {
+            hideMsg();
+            const inputs = document.querySelectorAll(`#view-signup-${current} input[required]`);
+            let isValid = true;
+            inputs.forEach(input => {
+                if (!input.reportValidity()) isValid = false;
+            });
+            if (isValid) window.setSignupStep(target);
+        };
+
+        window.setSignupStep = function(stepNum) {
+            document.querySelectorAll('#signupForm .view-section').forEach(el => el.classList.remove('active'));
+            document.getElementById(`view-signup-${stepNum}`).classList.add('active');
+
+            const ind1 = document.getElementById('ind-1');
+            const ind2 = document.getElementById('ind-2');
+            const ind3 = document.getElementById('ind-3');
+
+            // Reset classes
+            [ind1, ind2, ind3].forEach(el => el.className = 'progress-step mono-num');
+            
+            // Apply states
+            if (stepNum >= 1) { ind1.classList.add('active'); ind1.innerHTML = stepNum > 1 ? '&#10003;' : '1'; }
+            if (stepNum > 1) { ind1.classList.add('completed'); ind1.classList.remove('active'); }
+            
+            if (stepNum >= 2) { ind2.classList.add('active'); ind2.innerHTML = stepNum > 2 ? '&#10003;' : '2'; }
+            if (stepNum > 2) { ind2.classList.add('completed'); ind2.classList.remove('active'); }
+            
+            if (stepNum === 3) { ind3.classList.add('active'); } else { ind3.innerHTML = '3'; }
+        };
+
+        function showMsg(text, type) {
+            msgBox.textContent = text;
+            msgBox.className = type;
+            msgBox.style.display = 'block';
+        }
+        function hideMsg() { msgBox.style.display = 'none'; }
+
+        function formatError(code) {
+            const map = {
+                'auth/invalid-credential': 'Invalid email or password.',
+                'auth/user-not-found': 'Account not found.',
+                'auth/wrong-password': 'Incorrect password.',
+                'auth/email-already-in-use': 'This email is already registered.',
+                'auth/weak-password': 'Password is too weak. (Min 6 chars)'
+            };
+            return map[code] || 'Authentication error. Please try again.';
+        }
+
+        // ==========================================
+        // FIREBASE AUTHENTICATION ACTIONS
+        // ==========================================
+
+        // 1. LOGIN HANDLER
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value.trim();
+            const pass = document.getElementById('loginPassword').value;
+            const btn = document.getElementById('btnLogin');
+            
+            btn.disabled = true;
+            btn.innerText = "Authenticating...";
+            hideMsg();
+
+            try {
+                const cred = await signInWithEmailAndPassword(auth, email, pass);
+                const user = cred.user;
+
+                // Document Fetch & Routing Gate
+                const docSnap = await getDoc(doc(db, "users", user.uid));
+                
+                if (docSnap.exists() && docSnap.data().onboardingCompleted === true) {
+                    window.location.href = "dashboard.html";
+                } else {
+                    window.location.href = "onboarding.html";
+                }
+            } catch (err) {
+                showMsg(formatError(err.code), "error");
+                btn.disabled = false;
+                btn.innerText = "Sign In";
+            }
+        });
+
+        // 2. SIGNUP HANDLER (Step 3 Submit)
+        document.getElementById('signupForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('btnSignup');
+            btn.disabled = true;
+            btn.innerText = "Initializing Identity...";
+            hideMsg();
+
+            const email = document.getElementById('regEmail').value.trim();
+            const pass = document.getElementById('regPassword').value;
+            const fName = document.getElementById('regFirstName').value.trim();
+            const lName = document.getElementById('regLastName').value.trim();
+            const college = document.getElementById('regCollege').value.trim();
+            const bio = document.getElementById('regBio').value.trim();
+            const skillsRaw = document.getElementById('regSkills').value.trim();
+            
+            const displayName = `${fName} ${lName}`;
+            const skillsArray = skillsRaw ? skillsRaw.split(',').map(s => s.trim()) : [];
+            const photoURL = `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=0fa391&color=ffffff&size=150&bold=true`;
+
+            try {
+                const cred = await createUserWithEmailAndPassword(auth, email, pass);
+                const user = cred.user;
+
+                // Initialize strict baseline document mapping
+                const payload = {
+                    uid: user.uid,
+                    displayName: displayName,
+                    email: user.email,
+                    profilePhoto: photoURL,
+                    collegeName: college,
+                    bio: bio,
+                    skills: skillsArray,
+                    onboardingCompleted: false, // Core constraint for gate logic
+                    createdAt: Date.now()
+                };
+
+                await setDoc(doc(db, "users", user.uid), payload);
+                
+                // Directly route to onboarding wizard
+                window.location.href = "onboarding.html";
+
+            } catch (err) {
+                showMsg(formatError(err.code), "error");
+                btn.disabled = false;
+                btn.innerText = "Create Premium Account";
+            }
+        });
+
+        // 3. FORGOT PASSWORD HANDLER
+        document.getElementById('forgotForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('forgotEmail').value.trim();
+            const btn = document.getElementById('btnForgot');
+            
+            btn.disabled = true;
+            btn.innerText = "Processing...";
+            hideMsg();
+
+            try {
+                await sendPasswordResetEmail(auth, email);
+                showMsg("Recovery link dispatched. Check your inbox.", "success");
+                setTimeout(() => window.switchView('view-login'), 3500);
+            } catch (err) {
+                showMsg(formatError(err.code), "error");
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "Send Link";
+            }
+        });
+
+        // 4. GOOGLE SSO HANDLER
+        document.getElementById('btnGoogleLogin').addEventListener('click', async () => {
+            hideMsg();
+            try {
+                const cred = await signInWithPopup(auth, googleProvider);
+                const user = cred.user;
+                
+                const userRef = doc(db, "users", user.uid);
+                const docSnap = await getDoc(userRef);
+
+                // If new Google user, create base doc
+                if (!docSnap.exists()) {
+                    const avatar = user.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.displayName)}&background=0fa391&color=fff&size=150&bold=true`;
+                    await setDoc(userRef, {
+                        uid: user.uid,
+                        displayName: user.displayName || "Anonymous",
+                        email: user.email,
+                        profilePhoto: avatar,
+                        onboardingCompleted: false,
+                        createdAt: Date.now()
+                    });
+                    window.location.href = "onboarding.html";
+                } else {
+                    if (docSnap.data().onboardingCompleted === true) {
+                        window.location.href = "dashboard.html";
+                    } else {
+                        window.location.href = "onboarding.html";
+                    }
+                }
+            } catch (err) {
+                showMsg(formatError(err.code), "error");
+            }
+        });
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campus Events | Tattva Nexus</title>
+    <style>
+        /* Global Variables */
+        :root {
+            --bg-color: #f3f4f6;
+            --card-color: #ffffff;
+            --primary-accent: #1e3a8a;
+            --secondary-accent: #3b82f6;
+            --text-color: #111827;
+            --text-light: #4b5563;
+            --border-color: #e5e7eb;
+            --sidebar-width: 260px;
+            --header-height: 70px;
+        }
+
+        /* Reset & Base */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-color); display: flex; min-height: 100vh; overflow-x: hidden; }
+
+        /* Sidebar */
+        .sidebar { width: var(--sidebar-width); background-color: var(--card-color); border-right: 1px solid var(--border-color); position: fixed; height: 100vh; left: 0; top: 0; display: flex; flex-direction: column; z-index: 100; }
+        .sidebar-logo { height: var(--header-height); display: flex; align-items: center; padding: 0 1.5rem; font-size: 1.25rem; font-weight: 800; color: var(--primary-accent); border-bottom: 1px solid var(--border-color); cursor: pointer; flex-shrink: 0; }
+        .logo-icon { width: 32px; height: 32px; background-color: var(--secondary-accent); color: white; border-radius: 8px; display: flex; justify-content: center; align-items: center; margin-right: 10px; font-weight: bold; }
+        .nav-menu { padding: 1.5rem 1rem; display: flex; flex-direction: column; gap: 0.5rem; flex-grow: 1; overflow-y: auto; scrollbar-width: none; -ms-overflow-style: none; }
+        .nav-menu::-webkit-scrollbar { display: none; }
+        .nav-item { display: flex; align-items: center; padding: 0.875rem 1rem; border-radius: 8px; color: var(--text-light); font-weight: 500; cursor: pointer; transition: all 0.2s ease; }
+        .nav-item:hover { background-color: var(--bg-color); color: var(--primary-accent); }
+        .nav-item.active { background-color: rgba(59, 130, 246, 0.1); color: var(--secondary-accent); border-right: 3px solid var(--secondary-accent); border-top-right-radius: 0; border-bottom-right-radius: 0; }
+        .nav-icon { margin-right: 12px; font-size: 1.1rem; }
+        .logout-item { margin-top: auto; color: #dc2626 !important; margin-bottom: 1.5rem; }
+        .logout-item:hover { background-color: #fef2f2 !important; }
+
+        /* Top Header */
+        .top-header { position: fixed; top: 0; left: var(--sidebar-width); right: 0; height: var(--header-height); background-color: var(--card-color); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; padding: 0 2rem; z-index: 90; }
+        .page-title { font-size: 1.25rem; font-weight: 600; color: var(--text-color); }
+        .header-actions { display: flex; align-items: center; gap: 1.5rem; }
+        .search-bar { position: relative; }
+        .search-bar input { padding: 0.5rem 1rem 0.5rem 2.5rem; border: 1px solid var(--border-color); border-radius: 20px; outline: none; width: 250px; font-size: 0.9rem; background-color: var(--bg-color); transition: width 0.3s ease, border-color 0.3s ease; }
+        .search-bar input:focus { width: 300px; border-color: var(--secondary-accent); background-color: white; }
+        .search-bar::before { content: '🔍'; position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-size: 0.9rem; opacity: 0.6; }
+        .user-profile { display: flex; align-items: center; gap: 0.75rem; cursor: pointer; }
+        .avatar { width: 40px; height: 40px; background-color: var(--primary-accent); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: 600; font-size: 1rem; text-transform: uppercase; }
+        .user-info span { display: block; font-size: 0.875rem; font-weight: 600; }
+        .user-info small { color: var(--text-light); font-size: 0.75rem; }
+
+        /* Main Content */
+        .main-content { margin-left: var(--sidebar-width); margin-top: var(--header-height); padding: 2rem; width: calc(100% - var(--sidebar-width)); }
+        .events-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+        
+        .btn-create { background-color: var(--primary-accent); color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 8px; font-weight: 600; cursor: pointer; transition: background-color 0.3s ease; display: flex; align-items: center; gap: 0.5rem; }
+        .btn-create:hover { background-color: #172554; }
+
+        /* Categories */
+        .categories { display: flex; gap: 1rem; margin-bottom: 2rem; overflow-x: auto; padding-bottom: 0.5rem; }
+        .cat-btn { padding: 0.5rem 1.25rem; background-color: var(--card-color); border: 1px solid var(--border-color); border-radius: 50px; color: var(--text-color); font-weight: 500; font-size: 0.9rem; cursor: pointer; white-space: nowrap; transition: all 0.3s ease; }
+        .cat-btn.active, .cat-btn:hover { background-color: var(--secondary-accent); color: white; border-color: var(--secondary-accent); }
+
+        /* Events Grid */
+        .events-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 1.5rem; }
+        
+        /* Updated Event Card with Poster */
+        .event-card { background-color: var(--card-color); border-radius: 12px; border: 1px solid var(--border-color); transition: box-shadow 0.3s ease, transform 0.3s ease; display: flex; flex-direction: column; overflow: hidden; }
+        .event-card:hover { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); transform: translateY(-3px); }
+        .event-poster { width: 100%; height: 180px; object-fit: cover; background-color: #e5e7eb; border-bottom: 1px solid var(--border-color); }
+        
+        .event-body { padding: 1.5rem; display: flex; gap: 1.25rem; flex-grow: 1; }
+        .calendar-icon { background-color: var(--bg-color); min-width: 60px; height: max-content; border-radius: 10px; overflow: hidden; text-align: center; border: 1px solid var(--border-color); flex-shrink: 0; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .calendar-month { background-color: var(--primary-accent); color: white; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; padding: 0.3rem 0; letter-spacing: 1px; }
+        .calendar-day { font-size: 1.5rem; font-weight: 800; color: var(--text-color); padding: 0.4rem 0; background-color: white; }
+        
+        .event-details { flex-grow: 1; display: flex; flex-direction: column; }
+        .event-category { font-size: 0.75rem; color: var(--secondary-accent); font-weight: 700; text-transform: uppercase; margin-bottom: 0.25rem; letter-spacing: 0.5px; }
+        .event-title { font-size: 1.15rem; font-weight: 700; color: var(--text-color); margin-bottom: 0.5rem; line-height: 1.3; }
+        .event-desc { font-size: 0.85rem; color: var(--text-light); margin-bottom: 1rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        
+        .event-info { display: flex; flex-direction: column; gap: 0.25rem; margin-bottom: 1rem; font-size: 0.85rem; color: var(--text-light); }
+        .info-row { display: flex; align-items: center; gap: 0.5rem; font-weight: 500; }
+        
+        .event-actions { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color); padding-top: 1rem; margin-top: auto; }
+        .attendees { font-size: 0.8rem; color: var(--text-light); font-weight: 600; }
+        
+        .btn-rsvp { background-color: var(--bg-color); color: var(--text-color); border: 1px solid var(--border-color); padding: 0.5rem 1.25rem; border-radius: 6px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; }
+        .btn-rsvp:hover { background-color: var(--border-color); }
+        .btn-rsvp.rsvpd { background-color: var(--primary-accent); color: white; border-color: var(--primary-accent); }
+        .btn-rsvp.rsvpd:hover { background-color: #172554; }
+
+        /* Modal Styles */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(4px); }
+        .modal-content { background: white; width: 90%; max-width: 550px; border-radius: 12px; padding: 2rem; position: relative; max-height: 90vh; overflow-y: auto; }
+        .close-modal { position: absolute; top: 1.5rem; right: 1.5rem; font-size: 1.5rem; cursor: pointer; color: var(--text-light); border: none; background: none; }
+        .form-group { margin-bottom: 1rem; }
+        .form-group label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.4rem; color: var(--text-color); }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 8px; outline: none; font-size: 0.95rem; }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--secondary-accent); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+        .split-group { display: flex; gap: 1rem; }
+        .split-group .form-group { flex: 1; }
+        
+        .upload-area { border: 2px dashed var(--border-color); border-radius: 8px; padding: 1.5rem; text-align: center; cursor: pointer; transition: border-color 0.3s; background-color: #f8fafc; }
+        .upload-area:hover { border-color: var(--secondary-accent); }
+        .progress-bar { height: 6px; background-color: var(--border-color); border-radius: 3px; overflow: hidden; margin-top: 10px; display: none; }
+        .progress-fill { height: 100%; background-color: var(--primary-accent); width: 0%; transition: width 0.3s; }
+        
+        .submit-btn { width: 100%; padding: 0.875rem; background-color: var(--primary-accent); color: white; border: none; border-radius: 8px; font-weight: 600; font-size: 1rem; cursor: pointer; margin-top: 1rem; }
+        .submit-btn:disabled { opacity: 0.7; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<aside class="sidebar">
+    <div class="sidebar-logo" onclick="window.location.href='index.html'">
+        <div class="logo-icon">T</div>
+        Tattva Nexus
+    </div>
+    <nav class="nav-menu">
+        <div class="nav-item" onclick="window.location.href='dashboard.html'">
+            <span class="nav-icon">📊</span> Dashboard
+        </div>
+        <div class="nav-item" onclick="window.location.href='gigs.html'">
+            <span class="nav-icon">💼</span> Gigs
+        </div>
+        <div class="nav-item" onclick="window.location.href='notes.html'">
+            <span class="nav-icon">📚</span> Notes
+        </div>
+        <div class="nav-item" onclick="window.location.href='marketplace.html'">
+            <span class="nav-icon">🛒</span> Marketplace
+        </div>
+        <div class="nav-item active" onclick="window.location.href='events.html'">
+            <span class="nav-icon">📅</span> Events
+        </div>
+        <div class="nav-item" onclick="window.location.href='community.html'">
+            <span class="nav-icon">👥</span> Community
+        </div>
+        <div class="nav-item" onclick="window.location.href='messages.html'">
+            <span class="nav-icon">💬</span> Messages
+        </div>
+        <div class="nav-item" onclick="window.location.href='profile.html'">
+            <span class="nav-icon">👤</span> Profile
+        </div>
+        <div class="nav-item logout-item" id="logoutBtn">
+            <span class="nav-icon">🚪</span> Logout
+        </div>
+    </nav>
+</aside>
+
+<!-- Top Header -->
+<header class="top-header">
+    <div class="page-title">Campus Events</div>
+    <div class="header-actions">
+        <div class="search-bar">
+            <input type="text" id="eventSearch" placeholder="Search events..." onkeyup="filterEvents()">
+        </div>
+        <div class="user-profile" onclick="window.location.href='profile.html'">
+            <div class="user-info" style="text-align: right;">
+                <span id="userNameDisplay">Loading...</span>
+                <small>Student</small>
+            </div>
+            <div class="avatar" id="userAvatar">?</div>
+        </div>
+    </div>
+</header>
+
+<!-- Main Content -->
+<main class="main-content">
+    
+    <div class="events-header">
+        <div>
+            <h1 style="font-size: 1.5rem; color: var(--primary-accent);">Discover What's Happening</h1>
+            <p style="color: var(--text-light); font-size: 0.9rem;">Never miss out on club meetings, career fairs, and campus parties.</p>
+        </div>
+        <button class="btn-create" id="openModalBtn">
+            + Create Event
+        </button>
+    </div>
+
+    <!-- Categories Filters -->
+    <div class="categories" id="catFilters">
+        <button class="cat-btn active" data-filter="all">All Events</button>
+        <button class="cat-btn" data-filter="career">Career & Networking</button>
+        <button class="cat-btn" data-filter="academic">Academic & Tech</button>
+        <button class="cat-btn" data-filter="social">Social & Parties</button>
+        <button class="cat-btn" data-filter="club">Club Meetings</button>
+    </div>
+
+    <!-- Events Grid -->
+    <div class="events-grid" id="eventsContainer">
+        <!-- Dynamic Event Cards Load Here -->
+        <div style="text-align: center; width: 100%; grid-column: 1/-1; padding: 3rem;">
+            <p style="color: var(--text-light);">Loading campus events...</p>
+        </div>
+    </div>
+</main>
+
+<!-- Create Event Modal -->
+<div class="modal-overlay" id="createEventModal">
+    <div class="modal-content">
+        <button class="close-modal" id="closeModalBtn">&times;</button>
+        <h2 style="margin-bottom: 1.5rem; color: var(--primary-accent);">Create New Event</h2>
+        
+        <form id="eventForm">
+            <!-- Image Upload -->
+            <div class="form-group">
+                <label>Event Poster</label>
+                <div class="upload-area" onclick="document.getElementById('eventImage').click()">
+                    <span id="uploadText">📷 Click to upload poster image</span>
+                    <input type="file" id="eventImage" accept="image/*" style="display: none;" required>
+                </div>
+                <div class="progress-bar" id="uploadProgress">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Event Title</label>
+                <input type="text" id="eventTitle" placeholder="e.g. Annual Tech Hackathon" required>
+            </div>
+
+            <div class="split-group">
+                <div class="form-group">
+                    <label>Date</label>
+                    <input type="date" id="eventDate" required>
+                </div>
+                <div class="form-group">
+                    <label>Time</label>
+                    <input type="time" id="eventTime" required>
+                </div>
+            </div>
+
+            <div class="split-group">
+                <div class="form-group">
+                    <label>Venue / Location</label>
+                    <input type="text" id="eventVenue" placeholder="e.g. Main Auditorium" required>
+                </div>
+                <div class="form-group">
+                    <label>Category</label>
+                    <select id="eventCategory" required>
+                        <option value="academic">Academic & Tech</option>
+                        <option value="career">Career & Networking</option>
+                        <option value="social">Social & Parties</option>
+                        <option value="club">Club Meetings</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Description</label>
+                <textarea id="eventDesc" rows="3" placeholder="What is this event about?" required></textarea>
+            </div>
+
+            <button type="submit" class="submit-btn" id="submitEventBtn">Post Event</button>
+        </form>
+    </div>
+</div>
+
+<!-- Appwrite SDK & Dynamic Logic -->
+<script type="module">
+    import { Client, Account, Databases, Storage, Query, ID } from "https://cdn.jsdelivr.net/npm/appwrite@14.0.1/+esm";
+
+    // Configuration setup
+    const APPWRITE_ENDPOINT = "https://sgp.cloud.appwrite.io/v1";
+    const APPWRITE_PROJECT_ID = "6a21633800287cda70c6";
+    const APPWRITE_DB_ID = "6a21640d001592135482";
+    const APPWRITE_COL_PROFILES = "profiles";
+    const APPWRITE_COL_EVENTS = "events";
+    const APPWRITE_BUCKET_ID = "event_media"; // Make sure to configure this storage bucket in your Appwrite Console
+
+    // Initialize Appwrite Client
+    const client = new Client()
+        .setEndpoint(APPWRITE_ENDPOINT)
+        .setProject(APPWRITE_PROJECT_ID);
+
+    const account = new Account(client);
+    const db = new Databases(client);
+    const storage = new Storage(client);
+
+    let currentUserUid = null;
+    let currentUserName = "User";
+    let unsubscribeEvents = null;
+
+    // UI Elements
+    const eventsContainer = document.getElementById('eventsContainer');
+    const userNameDisplay = document.getElementById('userNameDisplay');
+    const userAvatar = document.getElementById('userAvatar');
+
+    // Modal Elements
+    const modal = document.getElementById('createEventModal');
+    const openModalBtn = document.getElementById('openModalBtn');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+    const eventForm = document.getElementById('eventForm');
+    const eventImageInput = document.getElementById('eventImage');
+    const uploadText = document.getElementById('uploadText');
+    const uploadProgress = document.getElementById('uploadProgress');
+    const progressFill = document.getElementById('progressFill');
+    const submitBtn = document.getElementById('submitEventBtn');
+
+    // Helper: Extract Month/Day
+    function formatEventDate(dateString) {
+        const date = new Date(dateString);
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        return {
+            month: months[date.getMonth()],
+            day: date.getDate().toString().padStart(2, '0')
+        };
+    }
+
+    // Modal Logic
+    openModalBtn.onclick = () => modal.style.display = 'flex';
+    closeModalBtn.onclick = () => {
+        modal.style.display = 'none';
+        eventForm.reset();
+        uploadText.innerText = "📷 Click to upload poster image";
+    };
+
+    // File Selection UI
+    eventImageInput.onchange = (e) => {
+        if (e.target.files.length > 0) {
+            uploadText.innerText = `📄 ${e.target.files[0].name}`;
+        }
+    };
+
+    // Handle Form Submission (Storage + Database)
+    eventForm.onsubmit = async (e) => {
+        e.preventDefault();
+        
+        const file = eventImageInput.files[0];
+        if (!file) {
+            alert("Please select an image poster!");
+            return;
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.innerText = "Uploading Image...";
+        uploadProgress.style.display = 'block';
+
+        try {
+            // 1. Upload file to Appwrite Storage
+            progressFill.style.width = '45%';
+            const fileResponse = await storage.createFile(
+                APPWRITE_BUCKET_ID,
+                ID.unique(),
+                file
+            );
+
+            progressFill.style.width = '100%';
+            
+            // 2. Retrieve layout URL
+            const downloadURL = storage.getFileView(APPWRITE_BUCKET_ID, fileResponse.$id).href;
+            
+            submitBtn.innerText = "Saving Event...";
+
+            // 3. Save event data document to Database Collection
+            await db.createDocument(
+                APPWRITE_DB_ID,
+                APPWRITE_COL_EVENTS,
+                ID.unique(),
+                {
+                    title: document.getElementById('eventTitle').value,
+                    date: document.getElementById('eventDate').value,
+                    time: document.getElementById('eventTime').value,
+                    venue: document.getElementById('eventVenue').value,
+                    category: document.getElementById('eventCategory').value,
+                    description: document.getElementById('eventDesc').value,
+                    posterUrl: downloadURL,
+                    organizerId: currentUserUid,
+                    organizerName: currentUserName,
+                    attendees: [], // Configured as a string array attribute inside your Appwrite console schema
+                    createdAt: new Date().toISOString()
+                }
+            );
+
+            // Success Cleanup
+            modal.style.display = 'none';
+            eventForm.reset();
+            uploadProgress.style.display = 'none';
+            progressFill.style.width = '0%';
+            uploadText.innerText = "📷 Click to upload poster image";
+            submitBtn.disabled = false;
+            submitBtn.innerText = "Post Event";
+        } catch (err) {
+            console.error("Event creation process failed:", err);
+            alert("Error creating event. Check that your collection properties and bucket attributes exist.");
+            submitBtn.disabled = false;
+            submitBtn.innerText = "Post Event";
+            uploadProgress.style.display = 'none';
+        }
+    };
+
+    // Real-Time Feed
+    function loadEvents() {
+        if (unsubscribeEvents) {
+            unsubscribeEvents();
+            unsubscribeEvents = null;
+        }
+
+        async function fetchAndRender() {
+            try {
+                const response = await db.listDocuments(
+                    APPWRITE_DB_ID,
+                    APPWRITE_COL_EVENTS,
+                    [Query.limit(100)]
+                );
+
+                eventsContainer.innerHTML = "";
+
+                if (response.documents.length === 0) {
+                    eventsContainer.innerHTML = `
+                        <div style="text-align: center; width: 100%; grid-column: 1/-1; padding: 3rem;">
+                            <p style="color: var(--text-light);">No events scheduled yet. Create the first one!</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                // Client-side sort by date ascending
+                const events = response.documents;
+                events.sort((a, b) => {
+                    const dateA = new Date(a.date).getTime();
+                    const dateB = new Date(b.date).getTime();
+                    return dateA - dateB;
+                });
+
+                events.forEach((event) => {
+                    const eventId = event.$id;
+                    const dateInfo = formatEventDate(event.date);
+                    
+                    // Determine RSVP Status
+                    const attendeesList = event.attendees || [];
+                    const isAttending = attendeesList.includes(currentUserUid);
+                    const rsvpClass = isAttending ? 'rsvpd' : '';
+                    const rsvpText = isAttending ? '⭐ Interested' : 'Interested';
+
+                    const eventHTML = `
+                        <div class="event-card" data-category="${event.category}">
+                            <img src="${event.posterUrl}" class="event-poster" alt="Event Poster" loading="lazy">
+                            <div class="event-body">
+                                <div class="calendar-icon">
+                                    <div class="calendar-month">${dateInfo.month}</div>
+                                    <div class="calendar-day">${dateInfo.day}</div>
+                                </div>
+                                <div class="event-details">
+                                    <div class="event-category">${event.category}</div>
+                                    <h3 class="event-title">${event.title}</h3>
+                                    <p class="event-desc">${event.description}</p>
+                                    
+                                    <div class="event-info">
+                                        <div class="info-row">📍 ${event.venue}</div>
+                                        <div class="info-row">🕒 ${event.time}</div>
+                                        <div class="info-row" style="color: var(--secondary-accent); font-size: 0.75rem;">
+                                            By ${event.organizerName}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="event-actions">
+                                        <span class="attendees">👥 ${attendeesList.length} Attending</span>
+                                        <button class="btn-rsvp ${rsvpClass}" onclick="toggleRSVP('${eventId}', ${isAttending})">
+                                            ${rsvpText}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    eventsContainer.insertAdjacentHTML('beforeend', eventHTML);
+                });
+
+                // Re-apply current filter
+                const activeFilterBtn = document.querySelector('.cat-btn.active');
+                if (activeFilterBtn) {
+                    applyCategoryFilter(activeFilterBtn.getAttribute('data-filter'));
+                }
+            } catch (error) {
+                console.error("Error retrieving campus events directory:", error);
+                eventsContainer.innerHTML = `
+                    <div style="text-align: center; width: 100%; grid-column: 1/-1; padding: 3rem;">
+                        <p style="color: var(--text-light);">Unable to read database registries.</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Run initial data render
+        fetchAndRender();
+
+        // Subscribe to real-time events collection updates
+        try {
+            unsubscribeEvents = client.subscribe(
+                `databases.${APPWRITE_DB_ID}.collections.${APPWRITE_COL_EVENTS}.documents`,
+                (response) => {
+                    const events = response.events;
+                    if (events.some(e => e.includes('.create') || e.includes('.update') || e.includes('.delete'))) {
+                        fetchAndRender();
+                    }
+                }
+            );
+        } catch (err) {
+            console.error("Real-time database feed initialization failed:", err);
+        }
+    }
+
+    // Global RSVP Logic
+    window.toggleRSVP = async function(eventId, isCurrentlyAttending) {
+        if (!currentUserUid) return alert("Please log in first.");
+        
+        try {
+            const eventDoc = await db.getDocument(APPWRITE_DB_ID, APPWRITE_COL_EVENTS, eventId);
+            let attendeesList = eventDoc.attendees || [];
+
+            if (isCurrentlyAttending) {
+                attendeesList = attendeesList.filter(uid => uid !== currentUserUid);
+            } else {
+                if (!attendeesList.includes(currentUserUid)) {
+                    attendeesList.push(currentUserUid);
+                }
+            }
+
+            await db.updateDocument(APPWRITE_DB_ID, APPWRITE_COL_EVENTS, eventId, {
+                attendees: attendeesList
+            });
+        } catch (error) {
+            console.error("RSVP toggling process encountered an error:", error);
+            alert("Failed to update RSVP status.");
+        }
+    };
+
+    // Category Filtering Logic
+    const filterBtns = document.querySelectorAll('.cat-btn');
+    filterBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            applyCategoryFilter(btn.getAttribute('data-filter'));
+        });
+    });
+
+    function applyCategoryFilter(filterValue) {
+        const eventCards = document.querySelectorAll('.event-card');
+        eventCards.forEach(card => {
+            if (filterValue === 'all') {
+                card.style.display = 'flex';
+            } else {
+                card.style.display = card.getAttribute('data-category') === filterValue ? 'flex' : 'none';
+            }
+        });
+    }
+
+    // Global Search Logic
+    window.filterEvents = function() {
+        const searchInput = document.getElementById('eventSearch').value.toLowerCase();
+        const eventCards = document.querySelectorAll('.event-card');
+        
+        eventCards.forEach(card => {
+            const title = card.querySelector('.event-title').innerText.toLowerCase();
+            const desc = card.querySelector('.event-desc').innerText.toLowerCase();
+            
+            if (title.includes(searchInput) || desc.includes(searchInput)) {
+                card.style.display = 'flex';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    };
+
+    // Auth State Check
+    async function checkAuth() {
+        try {
+            const user = await account.get();
+            currentUserUid = user.$id;
+            
+            try {
+                const userDoc = await db.getDocument(APPWRITE_DB_ID, APPWRITE_COL_PROFILES, currentUserUid);
+                if (userDoc && userDoc.firstName) {
+                    currentUserName = `${userDoc.firstName || ''} ${userDoc.lastName || ''}`.trim();
+                } else if (user.email) {
+                    currentUserName = user.email.split('@')[0];
+                }
+            } catch (e) { 
+                console.error("Profiles look up failed:", e); 
+                currentUserName = user.email ? user.email.split('@')[0] : "Student";
+            }
+
+            userNameDisplay.textContent = currentUserName.charAt(0).toUpperCase() + currentUserName.slice(1);
+            userAvatar.textContent = currentUserName.charAt(0).toUpperCase();
+
+            loadEvents();
+        } catch (error) {
+            console.error("Auth routing redirect:", error);
+            window.location.href = "login.html";
+        }
+    }
+
+    checkAuth();
+
+    // Logout
+    document.getElementById('logoutBtn').onclick = async () => {
+        try {
+            await account.deleteSession('current');
+            window.location.href = 'login.html';
+        } catch (error) {
+            console.error("Logout process failed:", error);
+        }
+    };
+
+</script>
+<script type="module" src="notifications.js"></script>
+</body>
+</html>

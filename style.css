@@ -1,0 +1,171 @@
+/* ==========================================================================
+   TATTVA NEXUS - ELITE DARK MODE GLASSMORPHIC DESIGN SYSTEM
+   High-fidelity architectural stylesheet (Vercel / Apple / Linear inspired)
+   ========================================================================== */
+
+:root {
+    /* --- Core System Color Palette --- */
+    --bg-main: #0b0f14;
+    --teal-primary: #0fa391;
+    --teal-primary-rgb: 15, 163, 145; /* Extracted for rgba() alpha channel manipulation */
+    --teal-hover: #098273;
+    --cobalt-accent: #004aad;
+    --cobalt-accent-rgb: 0, 74, 173;  /* Extracted for rgba() alpha channel manipulation */
+    
+    /* --- Glassmorphism Engine Variables --- */
+    --glass-bg: rgba(255, 255, 255, 0.035);
+    --glass-bg-hover: rgba(255, 255, 255, 0.06); /* Brighter offset for interactions */
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --glass-border-hover: rgba(255, 255, 255, 0.18);
+    
+    /* --- Premium Ambient Shadow Physics Variables --- */
+    --shadow-layer-1: rgba(0, 0, 0, 0.1);
+    --shadow-layer-2: rgba(0, 0, 0, 0.15);
+    --shadow-layer-3: rgba(0, 0, 0, 0.2);
+    --shadow-inset-light: rgba(255, 255, 255, 0.1);
+    
+    /* --- Micro-Interaction Physics Variables --- */
+    --spring-easing: cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-speed: 0.25s;
+}
+
+/* ==========================================================================
+   BASE APPLICATION CANVAS
+   ========================================================================== */
+body {
+    background-color: var(--bg-main);
+    color: #ffffff;
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* ==========================================================================
+   1 & 3. TRUE FROSTED GLASSMORPHISM ENGINE & AMBIENT SHADOWS
+   Benchmark component utility class for all cards, panels, and containers.
+   ========================================================================== */
+.glass-card {
+    background: var(--glass-bg);
+    /* Heavy blurring and saturation for authentic frosted glass look */
+    -webkit-backdrop-filter: blur(16px) saturate(120%);
+    backdrop-filter: blur(16px) saturate(120%);
+    /* Luminous rim lighting edge */
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+}
+
+.premium-shadow {
+    /* Multi-layered depth replacing standard flat drop-shadows */
+    box-shadow: 
+        0 2px 4px var(--shadow-layer-1),     /* Close ambient occlusion */
+        0 10px 20px var(--shadow-layer-2),   /* Mid-range light diffusion */
+        0 20px 40px var(--shadow-layer-3),   /* Deep environmental drop */
+        inset 0 1px 0 var(--shadow-inset-light); /* Top-edge inset rim light */
+}
+
+/* Combined utility for immediate elevated glass panels */
+.glass-panel-elevated {
+    background: var(--glass-bg);
+    -webkit-backdrop-filter: blur(16px) saturate(120%);
+    backdrop-filter: blur(16px) saturate(120%);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    box-shadow: 
+        0 2px 4px var(--shadow-layer-1),
+        0 10px 20px var(--shadow-layer-2),
+        0 20px 40px var(--shadow-layer-3),
+        inset 0 1px 0 var(--shadow-inset-light);
+}
+
+/* ==========================================================================
+   2. GLOW AND MESH GRADIENTS (BEHIND THE GLASS)
+   Fixed volumetric background lighting setup.
+   ========================================================================== */
+.mesh-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1; /* Prevents overlap with UI content */
+    background-color: var(--bg-main);
+    overflow: hidden;
+    pointer-events: none; /* Allows clicks to pass through */
+}
+
+/* Top Right Volumetric Teal Glow */
+.mesh-bg::before {
+    content: '';
+    position: absolute;
+    top: -10%;
+    right: -10%;
+    width: 55vw;
+    height: 55vw;
+    /* Soft teal bloom fading to transparent */
+    background: radial-gradient(circle, rgba(var(--teal-primary-rgb), 0.15) 0%, rgba(var(--teal-primary-rgb), 0) 70%);
+    border-radius: 50%;
+    filter: blur(130px);
+    transform: translate3d(0, 0, 0); /* Forces GPU hardware acceleration */
+}
+
+/* Bottom Left Deep Cobalt Ambient Glow */
+.mesh-bg::after {
+    content: '';
+    position: absolute;
+    bottom: -15%;
+    left: -10%;
+    width: 65vw;
+    height: 65vw;
+    /* Rich cobalt bloom fading to transparent */
+    background: radial-gradient(circle, rgba(var(--cobalt-accent-rgb), 0.10) 0%, rgba(var(--cobalt-accent-rgb), 0) 70%);
+    border-radius: 50%;
+    filter: blur(130px);
+    transform: translate3d(0, 0, 0); /* Forces GPU hardware acceleration */
+}
+
+/* ==========================================================================
+   4. MICRO-INTERACTIONS & TRANSITIONS
+   Tactile logic for buttons, pills, inputs, and actionable links.
+   ========================================================================== */
+.interactive-element {
+    /* Universal smooth easing */
+    transition: all var(--transition-speed) var(--spring-easing);
+    cursor: pointer;
+    will-change: transform, box-shadow, background-color, border-color;
+}
+
+.interactive-element:hover {
+    /* Tactile Elevation */
+    transform: translateY(-2px);
+    
+    /* Increased glass brightness and harsher rim lighting */
+    background: var(--glass-bg-hover);
+    border-color: var(--glass-border-hover);
+    
+    /* Soft neon external glow matching the teal primary */
+    box-shadow: 
+        0 0 15px rgba(var(--teal-primary-rgb), 0.4),
+        0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.interactive-element:active {
+    /* Press-in tactile depression */
+    transform: translateY(0) scale(0.98);
+    
+    /* Constrict the glow heavily on depression */
+    box-shadow: 0 0 8px rgba(var(--teal-primary-rgb), 0.3);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* ==========================================================================
+   5. MONOSPACE METRIC NUMBERING (THE FINTECH LOOK)
+   Typography utility strictly for quantitative data, stats, and tallies.
+   ========================================================================== */
+.metric-mono {
+    font-family: 'JetBrains Mono', 'SF Mono', 'Fira Code', Menlo, Monaco, Consolas, monospace;
+    font-variant-numeric: tabular-nums; /* Prevents horizontal layout shifting during live data changes */
+    letter-spacing: -0.02em;
+    font-weight: 600;
+}

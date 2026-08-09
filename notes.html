@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Study Notes | Tattva Nexus</title>
+<style>
+/* =======================================
+GLOBAL VARIABLES & BASE STYLES
+======================================= */
+:root {
+--bg-color: #f3f4f6;
+--card-color: #ffffff;
+--primary-accent: #1e3a8a;
+--secondary-accent: #3b82f6;
+--text-color: #111827;
+--text-light: #4b5563;
+--border-color: #e5e7eb;
+--sidebar-width: 260px;
+--header-height: 70px;
+--danger-color: #ef4444;
+--success-color: #10b981;
+}
+* {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        display: flex;
+        min-height: 100vh;
+        overflow-x: hidden;
+    }
+
+    /* =======================================
+       SIDEBAR
+       ======================================= */
+    .sidebar {
+        width: var(--sidebar-width);
+        background-color: var(--card-color);
+        border-right: 1px solid var(--border-color);
+        position: fixed;
+        height: 100vh; 
+        left: 0;
+        top: 0;
+        display: flex; 
+        flex-direction: column; 
+        z-index: 100;
+    }
+
+    .sidebar-logo {
+        height: var(--header-height);
+        display: flex;
+        align-items: center;
+        padding: 0 1.5rem;
+        font-size: 1.25rem;
+        font-weight: 800;
+        color: var(--primary-accent);
+        border-bottom: 1px solid var(--border-color);
+        cursor: pointer;
+        flex-shrink: 0; 
+    }
+
+    .logo-icon {
+        width: 32px;
+        height: 32px;
+        background-color: var(--secondary-accent);
+        color: white;
+        border-radius: 8px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-right: 10px;
+        font-weight: bold;
+    }
+
+    .nav-menu {
+        padding: 1.5rem 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        flex-grow: 1; 
+        overflow-y: auto; 
+        scrollbar-width: none; 
+    }
+
+    .nav-menu::-webkit-scrollbar { display: none; }
+
+    .nav-item {
+        display: flex;
+        align-items: center;
+        padding: 0.875rem 1rem;
+        border-radius: 8px;
+        color: var(--text-light);
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .nav-item:hover {
+        background-color: var(--bg-color);
+        color: var(--primary-accent);
+    }
+
+    .nav-item.active {
+        background-color: rgba(59, 130, 246, 0.1);
+        color: var(--secondary-accent);
+        border-right: 3px solid var(--secondary-accent);
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+    }
+
+    .nav-icon { margin-right: 12px; font-size: 1.1rem; }
+
+    .logout-item {
+        margin-top: auto;
+        color: var(--danger-color) !important;
+        margin-bottom: 1.5rem;
+    }
+    .logout-item:hover { background-color: #fef2f2 !important; }
+
+    /* =======================================
+       TOP HEADER
+       ======================================= */
+    .top-header {
+        position: fixed;
+        top: 0;
+        left: var(--sidebar-width);
+        right: 0;
+        height: var(--header-height);
+        background-color: var(--card-color);
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 2rem;
+        z-index: 90;
+    }
+
+    .page-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--text-color);
+    }
+
+    .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+    }
+
+    .search-bar { position: relative; }
+    .search-bar input {
+        padding: 0.5rem 1rem 0.5rem 2.5rem;
+        border: 1px solid var(--border-color);
+        border-radius: 20px;
+        outline: none;
+        width: 250px;
+        font-size: 0.9rem;
+        background-color: var(--bg-color);
+        transition: width 0.3s ease, border-color 0.3s ease;
+    }
+    .search-bar input:focus {
+        width: 300px;
+        border-color: var(--secondary-accent);
+        background-color: white;
+    }
+    .search-bar::before {
+        content: '🔍';
+        position: absolute;
+        left: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 0.9rem;
+        opacity: 0.6;
+    }
+
+    .user-profile {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        cursor: pointer;
+    }
+    .avatar {
+        width: 40px;
+        height: 40px;
+        background-color: var(--primary-accent);
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-weight: 600;
+        font-size: 1rem;
+        text-transform: uppercase;
+    }
+    .user-info span { display: block; font-size: 0.875rem; font-weight: 600; }
+    .user-info small { color: var(--text-light); font-size: 0.75rem; }
+
+    /* =======================================
+       MAIN CONTENT & CONTROLS
+       ======================================= */
+    .main-content {
+        margin-left: var(--sidebar-width);
+        margin-top: var(--header-height);
+        padding: 2rem;
+        width: calc(100% - var(--sidebar-width));
+    }
+
+    .notes-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .btn-upload {
+        background-color: var(--primary-accent);
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .btn-upload:hover { background-color: #172554; }
+
+    .view-tabs {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 1.5rem;
+        background-color: var(--card-color);
+        padding: 0.5rem;
+        border-radius: 10px;
+        display: inline-flex;
+        border: 1px solid var(--border-color);
+    }
+    
+    .view-tab {
+        padding: 0.6rem 1.5rem;
+        border: none;
+        background: none;
+        border-radius: 6px;
+        font-weight: 600;
+        color: var(--text-light);
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .view-tab.active {
+        background-color: var(--bg-color);
+        color: var(--primary-accent);
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .departments {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 2rem;
+        overflow-x: auto;
+        padding-bottom: 0.5rem;
+    }
+    .dept-btn {
+        padding: 0.5rem 1.25rem;
+        background-color: var(--card-color);
+        border: 1px solid var(--border-color);
+        border-radius: 50px;
+        color: var(--text-color);
+        font-weight: 500;
+        font-size: 0.9rem;
+        cursor: pointer;
+        white-space: nowrap;
+        transition: all 0.3s ease;
+    }
+    .dept-btn.active, .dept-btn:hover {
+        background-color: var(--secondary-accent);
+        color: white;
+        border-color: var(--secondary-accent);
+    }
+
+    /* =======================================
+       NOTES GRID & CARDS
+       ======================================= */
+    .notes-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .note-card {
+        background-color: var(--card-color);
+        border-radius: 12px;
+        border: 1px solid var(--border-color);
+        padding: 1.5rem;
+        transition: box-shadow 0.3s ease, transform 0.3s ease;
+        display: flex;
+        flex-direction: column;
+        cursor: pointer;
+    }
+    .note-card:hover {
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.05);
+        transform: translateY(-3px);
+        border-color: var(--secondary-accent);
+    }
+
+    .note-header-wrap {
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .file-icon {
+        width: 45px;
+        height: 45px;
+        border-radius: 10px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 1rem;
+        font-weight: bold;
+        color: white;
+        flex-shrink: 0;
+        background-color: var(--secondary-accent);
+    }
+    .icon-pdf { background-color: var(--danger-color); }
+    .icon-ppt { background-color: #f97316; }
+
+    .note-title-area { flex: 1; overflow: hidden; }
+    .note-title-area h3 {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--text-color);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        margin-bottom: 0.25rem;
+    }
+    .note-subject {
+        font-size: 0.85rem;
+        color: var(--secondary-accent);
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+    .note-body {
+        flex-grow: 1;
+        margin-bottom: 1.5rem;
+    }
+    .note-desc-preview {
+        font-size: 0.85rem;
+        color: var(--text-light);
+        line-height: 1.5;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        margin-bottom: 0.75rem;
+    }
+    .note-author {
+        font-size: 0.8rem;
+        color: var(--text-light);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-top: 1px solid var(--border-color);
+        padding-top: 0.75rem;
+    }
+    .note-author span { font-weight: 600; color: var(--text-color); }
+
+    .note-actions { display: flex; gap: 0.75rem; }
+    .btn-action {
+        flex: 1;
+        padding: 0.6rem;
+        border-radius: 6px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        cursor: pointer;
+        text-align: center;
+        transition: all 0.3s ease;
+        border: none;
+    }
+    .btn-download { 
+        background-color: rgba(59, 130, 246, 0.1); 
+        color: var(--secondary-accent); 
+    }
+    .btn-download:hover { 
+        background-color: var(--secondary-accent); 
+        color: white; 
+    }
+    .btn-delete {
+        background-color: rgba(239, 68, 68, 0.1);
+        color: var(--danger-color);
+        flex: 0.3;
+    }
+    .btn-delete:hover {
+        background-color: var(--danger-color);
+        color: white;
+    }
+
+    /* =======================================
+       PRIME MODAL ALIGNMENT (HARDCORE OVERRIDE)
+       ======================================= */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.85);
+        backdrop-filter: blur(8px);
+        z-index: 9998;
+        display: none;
+    }
+
+    .modal-card {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 9999;
+        background: #fff;
+        max-height: 90vh;
+        overflow-y: auto;
+        width: 90%;
+        max-width: 500px;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        display: none;
+    }
+
+    /* Utility classes for toggling visibility */
+    .active-overlay { display: block; }
+    .active-modal { display: block; }
+
+    .modal-header {
+        display: flex; justify-content: space-between; align-items: center;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid var(--border-color);
+    }
+    .modal-title { color: var(--primary-accent); font-size: 1.25rem; font-weight: 700; }
+    .close-modal { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-light); }
+    .close-modal:hover { color: var(--danger-color); }
+
+    .form-row {
+        display: flex;
+        gap: 1rem;
+    }
+    .form-row .form-group {
+        flex: 1;
+    }
+
+    .form-group { margin-bottom: 1.25rem; }
+    .form-group label { display: block; font-weight: 600; font-size: 0.9rem; margin-bottom: 0.5rem; color: var(--text-color);}
+    .form-group input, .form-group textarea, .form-group select {
+        width: 100%; padding: 0.75rem; border: 1px solid var(--border-color);
+        border-radius: 8px; outline: none; font-size: 0.95rem; background: var(--bg-color);
+        transition: all 0.3s ease;
+    }
+    .form-group input:focus, .form-group textarea:focus, .form-group select:focus { 
+        border-color: var(--secondary-accent); background: white;
+    }
+
+    /* Custom file input styling */
+    input[type="file"]::file-selector-button {
+        background-color: var(--primary-accent);
+        color: white;
+        padding: 0.5rem 1rem;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: bold;
+        margin-right: 10px;
+        transition: background-color 0.3s;
+    }
+    input[type="file"]::file-selector-button:hover {
+        background-color: var(--secondary-accent);
+    }
+
+    .modal-footer { display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1.5rem; }
+    .btn-cancel { background-color: var(--bg-color); color: var(--text-color); border: none; padding: 0.75rem 1.5rem; border-radius: 8px; cursor: pointer; font-weight: 600; }
+    .btn-submit { background-color: var(--secondary-accent); color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 8px; cursor: pointer; font-weight: 600; }
+    .btn-submit:disabled { background-color: #93c5fd; cursor: not-allowed; }
+</style>
+</head>
+<body>
+    <!-- SIDEBAR -->
+<aside class="sidebar">
+    <div class="sidebar-logo" onclick="window.location.href='index.html'">
+        <div class="logo-icon">T</div>
+        Tattva Nexus
+    </div>
+    <nav class="nav-menu">
+        <div class="nav-item" onclick="window.location.href='dashboard.html'"><span class="nav-icon">📊</span> Dashboard</div>
+        <div class="nav-item" onclick="window.location.href='gigs.html'"><span class="nav-icon">💼</span> Gigs</div>
+        <div class="nav-item active" onclick="window.location.href='notes.html'"><span class="nav-icon">📚</span> Notes</div>
+        <div class="nav-item" onclick="window.location.href='marketplace.html'"><span class="nav-icon">🛒</span> Marketplace</div>
+        <div class="nav-item" onclick="window.location.href='events.html'"><span class="nav-icon">📅</span> Events</div>
+        <div class="nav-item" onclick="window.location.href='community.html'"><span class="nav-icon">👥</span> Community</div>
+        <div class="nav-item" onclick="window.location.href='messages.html'"><span class="nav-icon">💬</span> Messages</div>
+        <div class="nav-item" onclick="window.location.href='profile.html'"><span class="nav-icon">👤</span> Profile</div>
+        <div class="nav-item logout-item" id="logoutBtn"><span class="nav-icon">🚪</span> Logout</div>
+    </nav>
+</aside>
+
+<!-- TOP HEADER -->
+<header class="top-header">
+    <div class="page-title">Marketplace - Study Materials</div>
+    <div class="header-actions">
+        <div class="search-bar">
+            <input type="text" id="searchInput" placeholder="Search subject or title...">
+        </div>
+        <div class="user-profile" onclick="window.location.href='profile.html'">
+            <div class="user-info" style="text-align: right;">
+                <span id="userNameDisplay">Loading...</span>
+                <small>Student</small>
+            </div>
+            <div class="avatar" id="userAvatar">?</div>
+        </div>
+    </div>
+</header>
+
+<!-- MAIN CONTENT -->
+<main class="main-content">
+    <div class="notes-header">
+        <div>
+            <h1 style="font-size: 1.5rem; color: var(--primary-accent);">Course Notes & Materials</h1>
+            <p style="color: var(--text-light); font-size: 0.9rem; margin-top: 0.25rem;">Explore curated study guides, lecture slides, and more.</p>
+        </div>
+        <button class="btn-upload" id="btnOpenUpload">
+            + Upload Notes
+        </button>
+    </div>
+
+    <div class="view-tabs">
+        <button class="view-tab active" id="tabAllNotes">All Items</button>
+        <button class="view-tab" id="tabMyNotes">My Items</button>
+    </div>
+
+    <div class="departments" id="deptFilters">
+        <button class="dept-btn active" data-filter="all">All Departments</button>
+        <button class="dept-btn" data-filter="compsci">Computer Science</button>
+        <button class="dept-btn" data-filter="business">Business</button>
+        <button class="dept-btn" data-filter="engineering">Engineering</button>
+        <button class="dept-btn" data-filter="arts">Arts & Humanities</button>
+        <button class="dept-btn" data-filter="science">Sciences</button>
+    </div>
+
+    <div class="notes-grid" id="notesContainer">
+        <!-- Rendered by JS -->
+    </div>
+</main>
+
+<!-- PRIME STANDARDS: STRICT INDEPENDENT MODAL & OVERLAY -->
+<div class="modal-overlay" id="addNoteOverlay"></div>
+<div class="modal-card" id="addNoteModal">
+    <div class="modal-header">
+        <h2 class="modal-title">Upload Study Material</h2>
+        <button class="close-modal" id="closeAddModal">&times;</button>
+    </div>
+    <form id="uploadNoteForm">
+        <div class="form-group">
+            <label for="noteTitle">Resource Title</label>
+            <input type="text" id="noteTitle" placeholder="e.g. Organic Chemistry Guide" required>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label for="noteSubject">Subject Name</label>
+                <input type="text" id="noteSubject" placeholder="e.g. Organic Chemistry" required>
+            </div>
+            <div class="form-group">
+                <label for="noteSubjectCode">Subject Code</label>
+                <input type="text" id="noteSubjectCode" placeholder="e.g. CHEM 212" required>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="noteDept">Field / Department</label>
+            <select id="noteDept">
+                <option value="compsci">Computer Science</option>
+                <option value="business">Business</option>
+                <option value="engineering">Engineering</option>
+                <option value="arts">Arts & Humanities</option>
+                <option value="science">Sciences</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="noteFile">Upload File</label>
+            <input type="file" id="noteFile" accept=".pdf,.doc,.docx,.ppt,.pptx,.txt" required>
+        </div>
+        <div class="form-group">
+            <label for="noteDesc">Detailed Description</label>
+            <textarea id="noteDesc" rows="4" placeholder="Briefly describe what's inside to help buyers/students..." required></textarea>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn-cancel" id="cancelAddBtn">Cancel</button>
+            <button type="submit" class="btn-submit" id="submitBtn">Upload Resource</button>
+        </div>
+    </form>
+</div>
+
+<!-- FIREBASE & LOGIC SCRIPT (STORAGE SYNC & FIRESTORE REALTIME) -->
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+    import { 
+        getFirestore, collection, addDoc, deleteDoc, doc, onSnapshot, query, where, serverTimestamp, getDoc 
+    } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+    import { 
+        getStorage, ref, uploadBytes, getDownloadURL 
+    } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-storage.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyCLo9rfV279AoHGGs3HheHgYQ5EgLcCzJo",
+        authDomain: "tattva-nexus.firebaseapp.com",
+        projectId: "tattva-nexus",
+        storageBucket: "tattva-nexus.firebasestorage.app",
+        messagingSenderId: "275334528",
+        appId: "1:275334528:web:48a4d050fdb91c1c142d65"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const storage = getStorage(app);
+
+    // Global State Array for Logic Engine
+    let activeUser = null;
+    let allNotes = [];
+    let currentFilterDept = 'all';
+    let currentTabMode = 'all'; // 'all' or 'my'
+    let unsubscribeNotes = null; // Stores snapshot listener instance
+
+    // UI DOM Elements
+    const notesContainer = document.getElementById('notesContainer');
+    const searchInput = document.getElementById('searchInput');
+    const deptBtns = document.querySelectorAll('.dept-btn');
+    const addOverlay = document.getElementById('addNoteOverlay');
+    const addModal = document.getElementById('addNoteModal');
+    
+    // Tab UI
+    const tabAllNotes = document.getElementById('tabAllNotes');
+    const tabMyNotes = document.getElementById('tabMyNotes');
+
+    /* =======================================
+       MODAL TOGGLES
+       ======================================= */
+    const openModal = () => {
+        addOverlay.classList.add('active-overlay');
+        addModal.classList.add('active-modal');
+    };
+    const closeModal = () => {
+        addOverlay.classList.remove('active-overlay');
+        addModal.classList.remove('active-modal');
+    };
+
+    document.getElementById('btnOpenUpload').onclick = openModal;
+    document.getElementById('closeAddModal').onclick = closeModal;
+    document.getElementById('cancelAddBtn').onclick = closeModal;
+    addOverlay.onclick = closeModal;
+
+    /* =======================================
+       AUTH LISTENER
+       ======================================= */
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            activeUser = user;
+            
+            // Firestore fetch user profile data for display name
+            let formattedName = "Student";
+            try {
+                const userDocSnap = await getDoc(doc(db, "users", user.uid));
+                if(userDocSnap.exists()) {
+                    const uData = userDocSnap.data();
+                    const rawName = uData.firstName || uData.fullName || user.displayName || user.email.split('@')[0];
+                    formattedName = rawName.charAt(0).toUpperCase() + rawName.slice(1);
+                } else {
+                    const name = user.displayName || user.email.split('@')[0];
+                    formattedName = name.charAt(0).toUpperCase() + name.slice(1);
+                }
+            } catch(e) {
+                const name = user.displayName || user.email.split('@')[0];
+                formattedName = name.charAt(0).toUpperCase() + name.slice(1);
+            }
+
+            document.getElementById('userNameDisplay').innerText = formattedName;
+            document.getElementById('userAvatar').innerText = formattedName.charAt(0);
+            
+            fetchNotes(currentTabMode);
+        } else {
+            window.location.href = "login.html";
+        }
+    });
+
+    /* =======================================
+       LOGIC: TABS SELECTION & DUAL-VIEW
+       ======================================= */
+    tabAllNotes.addEventListener('click', () => {
+        tabAllNotes.classList.add('active');
+        tabMyNotes.classList.remove('active');
+        currentTabMode = 'all';
+        fetchNotes(currentTabMode); 
+    });
+
+    tabMyNotes.addEventListener('click', () => {
+        tabMyNotes.classList.add('active');
+        tabAllNotes.classList.remove('active');
+        currentTabMode = 'my';
+        fetchNotes(currentTabMode); 
+    });
+
+    /* =======================================
+       LOGIC: FETCH DATA (FIRESTORE ONSNAPSHOT)
+       ======================================= */
+    function fetchNotes(mode) {
+        if (!activeUser) return;
+
+        if (unsubscribeNotes) {
+            unsubscribeNotes();
+        }
+
+        const notesCollection = collection(db, 'notes');
+        let q;
+
+        // PRIME STANDARD 3: DUAL-VIEW FILTER LOGIC using "uid"
+        if (mode === 'my') {
+            q = query(notesCollection, where("uid", "==", activeUser.uid));
+        } else {
+            q = query(notesCollection);
+        }
+
+        // Real-time UI feed
+        unsubscribeNotes = onSnapshot(q, (snapshot) => {
+            allNotes = [];
+            snapshot.forEach((document) => {
+                allNotes.push({
+                    id: document.id,
+                    ...document.data()
+                });
+            });
+
+            allNotes.sort((a, b) => {
+                const timeA = a.timestamp?.toMillis ? a.timestamp.toMillis() : 0;
+                const timeB = b.timestamp?.toMillis ? b.timestamp.toMillis() : 0;
+                return timeB - timeA;
+            });
+
+            applyFiltersAndRender();
+        }, (error) => {
+            console.error("Error fetching notes:", error);
+        });
+    }
+
+    /* =======================================
+       LOGIC: FILTERS & SEARCH
+       ======================================= */
+    function applyFiltersAndRender() {
+        const searchTerm = searchInput.value.toLowerCase().trim();
+        
+        const filteredNotes = allNotes.filter(note => {
+            const matchDept = currentFilterDept === 'all' || note.dept === currentFilterDept;
+            const titleStr = (note.title || '').toLowerCase();
+            const subjStr = (note.subject || '').toLowerCase();
+            const codeStr = (note.subjectCode || '').toLowerCase();
+            const matchSearch = searchTerm === '' || titleStr.includes(searchTerm) || subjStr.includes(searchTerm) || codeStr.includes(searchTerm);
+            
+            return matchDept && matchSearch;
+        });
+
+        renderNotes(filteredNotes);
+    }
+
+    searchInput.addEventListener('input', applyFiltersAndRender);
+
+    deptBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            deptBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentFilterDept = btn.getAttribute('data-filter');
+            applyFiltersAndRender();
+        });
+    });
+
+    /* =======================================
+       LOGIC: RENDER ENGINE
+       ======================================= */
+    function renderNotes(notesArray) {
+        notesContainer.innerHTML = ''; 
+
+        if (notesArray.length === 0) {
+            notesContainer.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: var(--text-light); padding: 3rem; font-weight: 500;">No study materials found.</p>`;
+            return;
+        }
+
+        notesArray.forEach(note => {
+            let iconClass = "icon-doc";
+            let ext = "DOC";
+            const lowerTitle = (note.title || "").toLowerCase();
+            if(lowerTitle.includes('pdf') || (note.fileName && note.fileName.toLowerCase().includes('.pdf'))) { iconClass = "icon-pdf"; ext = "PDF"; }
+            if(lowerTitle.includes('ppt') || (note.fileName && note.fileName.toLowerCase().includes('.ppt'))) { iconClass = "icon-ppt"; ext = "PPT"; }
+
+            const safeTitle = (note.title || 'Untitled').replace(/"/g, '&quot;');
+            const displaySubject = note.subjectCode ? `${note.subjectCode} - ${note.subject}` : note.subject;
+            const safeSubject = (displaySubject || 'N/A').replace(/"/g, '&quot;');
+            const safeAuthor = (note.uploaderName || 'Student').replace(/"/g, '&quot;');
+            const shortDesc = note.description ? note.description : 'No description provided.';
+            
+            let dateStr = "Recently";
+            if (note.timestamp && note.timestamp.toDate) {
+                dateStr = note.timestamp.toDate().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            }
+
+            let deleteBtnHtml = '';
+            if (activeUser && note.uid === activeUser.uid) {
+                deleteBtnHtml = `<button class="btn-action btn-delete" data-id="${note.id}">Delete</button>`;
+            }
+
+            const card = document.createElement('div');
+            card.className = 'note-card';
+            card.innerHTML = `
+                <div class="note-header-wrap">
+                    <div class="file-icon ${iconClass}">${ext}</div>
+                    <div class="note-title-area">
+                        <h3>${safeTitle}</h3>
+                        <div class="note-subject">${safeSubject}</div>
+                    </div>
+                </div>
+                <div class="note-body">
+                    <div class="note-desc-preview">${shortDesc}</div>
+                    <div class="note-author">
+                        <div>By <span>${safeAuthor}</span></div>
+                        <div>${dateStr}</div>
+                    </div>
+                </div>
+                <div class="note-actions">
+                    <button class="btn-action btn-download">Download File</button>
+                    ${deleteBtnHtml}
+                </div>
+            `;
+
+            card.addEventListener('click', () => {
+                window.location.href = `note-details.html?id=${note.id}`;
+            });
+
+            const dwnBtn = card.querySelector('.btn-download');
+            dwnBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                window.open(note.fileUrl || '#', '_blank');
+            });
+
+            const delBtn = card.querySelector('.btn-delete');
+            if (delBtn) {
+                delBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    deleteNote(note.id);
+                });
+            }
+
+            notesContainer.appendChild(card);
+        });
+    }
+
+    /* =======================================
+       LOGIC: UPLOAD TO STORAGE -> SAVE TO FIRESTORE
+       ======================================= */
+    const uploadForm = document.getElementById('uploadNoteForm');
+    uploadForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (!activeUser) return;
+
+        const fileInput = document.getElementById('noteFile');
+        const file = fileInput.files[0];
+        if (!file) {
+            alert("Please select a file to upload.");
+            return;
+        }
+
+        const submitBtn = document.getElementById('submitBtn');
+        submitBtn.disabled = true;
+        submitBtn.innerText = "Uploading File...";
+
+        try {
+            // PRIME STANDARD 2: FIRESTORE & STORAGE SYNC
+            // Wait for upload to Storage first
+            const storageRef = ref(storage, `notes/${Date.now()}_${file.name}`);
+            await uploadBytes(storageRef, file);
+            
+            submitBtn.innerText = "Generating Link...";
+            // Wait for the download URL
+            const downloadURL = await getDownloadURL(storageRef);
+
+            submitBtn.innerText = "Saving Resource...";
+            // Save it to the Firestore collection
+            const dataToSave = {
+                title: document.getElementById('noteTitle').value.trim(),
+                subject: document.getElementById('noteSubject').value.trim(),
+                subjectCode: document.getElementById('noteSubjectCode').value.trim(),
+                dept: document.getElementById('noteDept').value,
+                fileName: file.name,
+                fileUrl: downloadURL,
+                description: document.getElementById('noteDesc').value.trim(),
+                uid: activeUser.uid, // Required for 'My Items' logic
+                uploaderName: document.getElementById('userNameDisplay').innerText,
+                timestamp: serverTimestamp() 
+            };
+
+            await addDoc(collection(db, 'notes'), dataToSave);
+            
+            uploadForm.reset();
+            closeModal();
+            
+            const alertMsg = document.createElement('div');
+            alertMsg.innerHTML = `<div style="position:fixed; bottom:20px; right:20px; background:var(--success-color); color:white; padding:15px 25px; border-radius:8px; z-index:9999; font-weight:bold; box-shadow:0 4px 6px rgba(0,0,0,0.1);">Resource uploaded successfully!</div>`;
+            document.body.appendChild(alertMsg);
+            setTimeout(() => alertMsg.remove(), 3000);
+        } catch (err) {
+            console.error("Upload Error:", err);
+            alert("Failed to upload: " + err.message);
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.innerText = "Upload Resource";
+        }
+    });
+
+    /* =======================================
+       LOGIC: DELETE RESOURCE (FIRESTORE)
+       ======================================= */
+    async function deleteNote(noteId) {
+        if(confirm("Are you sure you want to delete this study material? This cannot be undone.")) {
+            try {
+                await deleteDoc(doc(db, 'notes', noteId));
+                console.log(`Successfully deleted note document: ${noteId}`);
+            } catch (err) {
+                console.error("Delete Error:", err);
+                alert("Error deleting note: " + err.message);
+            }
+        }
+    }
+
+    /* =======================================
+       LOGIC: LOGOUT
+       ======================================= */
+    document.getElementById('logoutBtn').onclick = () => {
+        signOut(auth).then(() => window.location.href = 'login.html');
+    };
+
+</script>
+<script type="module" src="notifications.js"></script>
+</body>
+</html>

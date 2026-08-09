@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Community | Tattva Nexus</title>
+<style>
+/* Global Variables */
+:root {
+--bg-color: #f3f4f6;
+--card-color: #ffffff;
+--primary-accent: #1e3a8a;
+--secondary-accent: #3b82f6;
+--text-color: #111827;
+--text-light: #4b5563;
+--border-color: #e5e7eb;
+--sidebar-width: 260px;
+--header-height: 70px;
+}
+/* Reset & Base */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        display: flex;
+        min-height: 100vh;
+        overflow-x: hidden;
+    }
+
+    /* Sidebar (Global) - Expert Flex Layout */
+    .sidebar {
+        width: var(--sidebar-width);
+        background-color: var(--card-color);
+        border-right: 1px solid var(--border-color);
+        position: fixed;
+        height: 100vh;
+        left: 0;
+        top: 0;
+        display: flex;
+        flex-direction: column;
+        z-index: 100;
+    }
+
+    .sidebar-logo {
+        height: var(--header-height);
+        display: flex;
+        align-items: center;
+        padding: 0 1.5rem;
+        font-size: 1.25rem;
+        font-weight: 800;
+        color: var(--primary-accent);
+        border-bottom: 1px solid var(--border-color);
+        cursor: pointer;
+        flex-shrink: 0;
+    }
+
+    .logo-icon {
+        width: 32px;
+        height: 32px;
+        background-color: var(--secondary-accent);
+        color: white;
+        border-radius: 8px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-right: 10px;
+        font-weight: bold;
+    }
+
+    .nav-menu {
+        padding: 1.5rem 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        flex-grow: 1;
+        overflow-y: auto;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+
+    .nav-menu::-webkit-scrollbar {
+        display: none;
+    }
+
+    .nav-item {
+        display: flex;
+        align-items: center;
+        padding: 0.875rem 1rem;
+        border-radius: 8px;
+        color: var(--text-light);
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .nav-item:hover {
+        background-color: var(--bg-color);
+        color: var(--primary-accent);
+    }
+
+    .nav-item.active {
+        background-color: rgba(59, 130, 246, 0.1);
+        color: var(--secondary-accent);
+        border-right: 3px solid var(--secondary-accent);
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+    }
+
+    .nav-icon {
+        margin-right: 12px;
+        font-size: 1.1rem;
+    }
+
+    .logout-item {
+        margin-top: auto;
+        color: #dc2626 !important;
+        margin-bottom: 1.5rem;
+    }
+
+    /* Top Header (Global) */
+    .top-header {
+        position: fixed;
+        top: 0;
+        left: var(--sidebar-width);
+        right: 0;
+        height: var(--header-height);
+        background-color: var(--card-color);
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 2rem;
+        z-index: 90;
+    }
+
+    .page-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--text-color);
+    }
+
+    .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+    }
+
+    .search-bar {
+        position: relative;
+    }
+
+    .search-bar input {
+        padding: 0.5rem 1rem 0.5rem 2.5rem;
+        border: 1px solid var(--border-color);
+        border-radius: 20px;
+        outline: none;
+        width: 250px;
+        font-size: 0.9rem;
+        background-color: var(--bg-color);
+        transition: width 0.3s ease, border-color 0.3s ease;
+    }
+
+    .search-bar input:focus {
+        width: 300px;
+        border-color: var(--secondary-accent);
+        background-color: white;
+    }
+
+    .search-bar::before {
+        content: '🔍';
+        position: absolute;
+        left: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 0.9rem;
+        opacity: 0.6;
+    }
+
+    .user-profile {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        cursor: pointer;
+    }
+
+    .avatar {
+        width: 40px;
+        height: 40px;
+        background-color: var(--primary-accent);
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-weight: 600;
+        font-size: 1rem;
+        text-transform: uppercase;
+    }
+
+    .user-info span {
+        display: block;
+        font-size: 0.875rem;
+        font-weight: 600;
+    }
+
+    .user-info small {
+        color: var(--text-light);
+        font-size: 0.75rem;
+    }
+
+    /* Main Content */
+    .main-content {
+        margin-left: var(--sidebar-width);
+        margin-top: var(--header-height);
+        padding: 2rem;
+        width: calc(100% - var(--sidebar-width));
+    }
+
+    /* Community Header & Filters */
+    .community-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+
+    .btn-create {
+        background-color: var(--primary-accent);
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .btn-create:hover {
+        background-color: #172554;
+    }
+
+    .filter-bar {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .filter-bar button {
+        padding: 0.6rem 1.5rem;
+        border: 1px solid var(--primary-accent);
+        border-radius: 20px;
+        background-color: transparent;
+        color: var(--primary-accent);
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .filter-bar button.active {
+        background-color: var(--primary-accent);
+        color: white;
+    }
+
+    /* Layout Grid */
+    .forum-layout {
+        display: grid;
+        grid-template-columns: 1fr 300px;
+        gap: 2rem;
+    }
+
+    /* Feed Section */
+    .thread-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1.25rem;
+    }
+
+    .thread-card {
+        background-color: var(--card-color);
+        border-radius: 12px;
+        border: 1px solid var(--border-color);
+        display: flex;
+        transition: box-shadow 0.3s ease;
+        overflow: hidden;
+    }
+
+    .thread-card:hover {
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+
+    /* Vote Column */
+    .vote-column {
+        background-color: rgba(243, 244, 246, 0.5);
+        padding: 1rem 0.75rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+        border-right: 1px solid var(--border-color);
+        min-width: 60px;
+    }
+
+    .vote-btn {
+        background: transparent;
+        border: none;
+        color: #9ca3af;
+        cursor: pointer;
+        font-size: 1.25rem;
+        transition: color 0.2s ease, transform 0.2s ease;
+    }
+
+    .vote-btn:hover {
+        transform: scale(1.2);
+    }
+
+    .vote-btn.upvote:hover, .vote-btn.upvote.active { color: #10b981; }
+    .vote-btn.downvote:hover, .vote-btn.downvote.active { color: #ef4444; }
+
+    .vote-count {
+        font-weight: 700;
+        font-size: 0.95rem;
+        color: var(--text-color);
+    }
+
+    /* Thread Content */
+    .thread-content {
+        padding: 1.25rem;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .thread-meta {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 0.5rem;
+        font-size: 0.85rem;
+        color: var(--text-light);
+    }
+
+    .thread-author {
+        font-weight: 600;
+        color: var(--text-color);
+    }
+
+    .thread-title {
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: var(--primary-accent);
+        margin-bottom: 0.5rem;
+    }
+
+    .thread-preview {
+        font-size: 0.95rem;
+        color: var(--text-light);
+        margin-bottom: 1rem;
+        line-height: 1.5;
+        white-space: pre-wrap;
+    }
+
+    .thread-image {
+        max-width: 100%;
+        max-height: 400px;
+        object-fit: cover;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+        border: 1px solid var(--border-color);
+    }
+
+    .thread-tags {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .tag {
+        background-color: rgba(59, 130, 246, 0.1);
+        color: var(--secondary-accent);
+        padding: 0.2rem 0.6rem;
+        border-radius: 50px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+    .thread-footer {
+        display: flex;
+        gap: 1.5rem;
+        font-size: 0.85rem;
+        color: var(--text-light);
+        font-weight: 500;
+        margin-top: auto;
+    }
+
+    .footer-action {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        cursor: pointer;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: var(--text-light);
+        font-size: 1.1rem;
+        background: var(--card-color);
+        border-radius: 12px;
+        border: 1px solid var(--border-color);
+    }
+
+    /* Trending Section */
+    .trending-card {
+        background-color: var(--card-color);
+        border-radius: 12px;
+        border: 1px solid var(--border-color);
+        padding: 1.5rem;
+        position: sticky;
+        top: calc(var(--header-height) + 2rem);
+    }
+
+    .trending-card h3 {
+        font-size: 1.1rem;
+        color: var(--text-color);
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .trending-list {
+        list-style: none;
+    }
+
+    .trending-item {
+        margin-bottom: 1rem;
+    }
+
+    .trending-topic {
+        display: block;
+        font-weight: 600;
+        color: var(--text-color);
+        margin-bottom: 0.2rem;
+        cursor: pointer;
+    }
+
+    .trending-stats {
+        font-size: 0.75rem;
+        color: var(--text-light);
+    }
+
+    /* PRIME STANDARD 1: HARDCORE CSS MODAL ALIGNMENT */
+    .modal-overlay { 
+        position: fixed; 
+        top: 0; 
+        left: 0; 
+        width: 100%; 
+        height: 100%; 
+        background: rgba(0,0,0,0.85); 
+        backdrop-filter: blur(8px); 
+        z-index: 9998; 
+        display: none; 
+    }
+
+    .add-entry-modal { 
+        position: fixed; 
+        top: 50%; 
+        left: 50%; 
+        transform: translate(-50%, -50%); 
+        z-index: 9999; 
+        background: #fff; 
+        max-height: 90vh; 
+        overflow-y: auto; 
+        display: none; 
+        width: 90%; 
+        max-width: 550px; 
+        padding: 2.5rem; 
+        border-radius: 12px;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    }
+
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .modal-header h2 {
+        font-size: 1.5rem;
+        color: var(--primary-accent);
+    }
+
+    .close-modal {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: var(--text-light);
+    }
+
+    .form-group {
+        margin-bottom: 1.25rem;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: var(--text-color);
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        font-size: 1rem;
+        outline: none;
+        transition: border-color 0.2s;
+    }
+
+    .form-control:focus {
+        border-color: var(--secondary-accent);
+    }
+
+    textarea.form-control {
+        resize: vertical;
+        min-height: 100px;
+    }
+
+    .btn-submit {
+        width: 100%;
+        padding: 1rem;
+        background-color: var(--primary-accent);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 1.1rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        margin-top: 1rem;
+    }
+
+    .btn-submit:hover {
+        background-color: #172554;
+    }
+
+    .btn-submit:disabled {
+        background-color: var(--text-light);
+        cursor: not-allowed;
+    }
+</style>
+</head>
+<body>
+    <!-- Sidebar -->
+<aside class="sidebar">
+    <div class="sidebar-logo" onclick="window.location.href='index.html'">
+        <div class="logo-icon">T</div>
+        Tattva Nexus
+    </div>
+    <nav class="nav-menu">
+        <div class="nav-item" onclick="window.location.href='dashboard.html'">
+            <span class="nav-icon">📊</span> Dashboard
+        </div>
+        <div class="nav-item" onclick="window.location.href='gigs.html'">
+            <span class="nav-icon">💼</span> Gigs
+        </div>
+        <div class="nav-item" onclick="window.location.href='notes.html'">
+            <span class="nav-icon">📚</span> Notes
+        </div>
+        <div class="nav-item" onclick="window.location.href='marketplace.html'">
+            <span class="nav-icon">🛒</span> Marketplace
+        </div>
+        <div class="nav-item" onclick="window.location.href='events.html'">
+            <span class="nav-icon">📅</span> Events
+        </div>
+        <div class="nav-item active" onclick="window.location.href='community.html'">
+            <span class="nav-icon">👥</span> Community
+        </div>
+        <div class="nav-item" onclick="window.location.href='messages.html'">
+            <span class="nav-icon">💬</span> Messages
+        </div>
+        <div class="nav-item" onclick="window.location.href='profile.html'">
+            <span class="nav-icon">👤</span> Profile
+        </div>
+        
+        <div class="nav-item logout-item" id="logoutBtn">
+            <span class="nav-icon">🚪</span> Logout
+        </div>
+    </nav>
+</aside>
+
+<!-- Top Header -->
+<header class="top-header">
+    <div class="page-title">Community Forum</div>
+    <div class="header-actions">
+        <div class="search-bar">
+            <input type="text" id="forumSearch" placeholder="Search discussions...">
+        </div>
+        <div class="user-profile" onclick="window.location.href='profile.html'">
+            <div class="user-info" style="text-align: right;">
+                <span id="userNameDisplay">User</span>
+                <small>Verified Student</small>
+            </div>
+            <div class="avatar" id="userAvatar">?</div>
+        </div>
+    </div>
+</header>
+
+<!-- Main Content -->
+<main class="main-content">
+    
+    <div class="community-header">
+        <div>
+            <h1 style="font-size: 1.5rem; color: var(--primary-accent);">Campus Discussions</h1>
+            <p style="color: var(--text-light); font-size: 0.9rem;">Ask questions, share advice, and connect with your peers.</p>
+        </div>
+        <button class="btn-create" id="btnOpenModal">
+            + New Post
+        </button>
+    </div>
+
+    <!-- PRIME STANDARD 3: DUAL-VIEW FILTER LOGIC -->
+    <div class="filter-bar">
+        <button class="filter-btn active" id="btnAllItems">All Posts</button>
+        <button class="filter-btn" id="btnMyItems">My Posts</button>
+    </div>
+
+    <div class="forum-layout">
+        
+        <!-- Feed Section -->
+        <div class="thread-list" id="threadContainer">
+            <div class="empty-state">Loading community posts...</div>
+        </div>
+
+        <!-- Trending Sidebar -->
+        <div class="trending-section">
+            <div class="trending-card">
+                <h3>Trending Topics</h3>
+                <ul class="trending-list">
+                    <li class="trending-item">
+                        <span class="trending-topic">#MidtermSeason</span>
+                        <div class="trending-stats">125 posts this week</div>
+                    </li>
+                    <li class="trending-item">
+                        <span class="trending-topic">#CareerFair</span>
+                        <div class="trending-stats">89 posts this week</div>
+                    </li>
+                    <li class="trending-item">
+                        <span class="trending-topic">#HousingHunt</span>
+                        <div class="trending-stats">54 posts this week</div>
+                    </li>
+                    <li class="trending-item">
+                        <span class="trending-topic">#CampusParking</span>
+                        <div class="trending-stats">42 posts this week</div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+    </div>
+</main>
+
+<!-- PRIME STANDARD 1: HARDCORE CSS MODAL ALIGNMENT -->
+<div class="modal-overlay" id="modalOverlay"></div>
+<div class="add-entry-modal" id="addEntryModal">
+    <div class="modal-header">
+        <h2>Create Community Post</h2>
+        <button class="close-modal" id="btnCloseModal">&times;</button>
+    </div>
+    
+    <div class="form-group">
+        <label for="postTitle">Post Title</label>
+        <input type="text" id="postTitle" class="form-control" placeholder="What do you want to discuss?" required>
+    </div>
+
+    <div class="form-group">
+        <label for="postContent">Content</label>
+        <textarea id="postContent" class="form-control" placeholder="Share your thoughts, ask a question, etc..."></textarea>
+    </div>
+
+    <div class="form-group">
+        <label for="postImage">Attach Media (Optional)</label>
+        <input type="file" id="postImage" class="form-control" accept="image/*">
+    </div>
+
+    <button id="btnSubmitPost" class="btn-submit">Publish Post</button>
+</div>
+
+<!-- Appwrite SDK & Dynamic Logic -->
+<script type="module">
+    import { Client, Account, Databases, Storage, Query, ID } from "https://cdn.jsdelivr.net/npm/appwrite@14.0.1/+esm";
+
+    // Configuration setup
+    const APPWRITE_ENDPOINT = "https://sgp.cloud.appwrite.io/v1";
+    const APPWRITE_PROJECT_ID = "6a21633800287cda70c6";
+    const APPWRITE_DB_ID = "6a21640d001592135482";
+    const APPWRITE_COL_PROFILES = "profiles"; // Provided collection ID
+    const APPWRITE_COL_COMMUNITY = "community"; // Custom collection for posts
+    const APPWRITE_BUCKET_ID = "community_media"; // Make sure to configure this storage bucket in your Appwrite Console
+
+    // Initialize Appwrite Client
+    const client = new Client()
+        .setEndpoint(APPWRITE_ENDPOINT)
+        .setProject(APPWRITE_PROJECT_ID);
+
+    const account = new Account(client);
+    const db = new Databases(client);
+    const storage = new Storage(client);
+
+    // UI References
+    const btnOpenModal = document.getElementById('btnOpenModal');
+    const btnCloseModal = document.getElementById('btnCloseModal');
+    const modalOverlay = document.getElementById('modalOverlay');
+    const addEntryModal = document.getElementById('addEntryModal');
+    const btnSubmitPost = document.getElementById('btnSubmitPost');
+    
+    const btnAllItems = document.getElementById('btnAllItems');
+    const btnMyItems = document.getElementById('btnMyItems');
+    const threadContainer = document.getElementById('threadContainer');
+
+    // Form Inputs
+    const postTitle = document.getElementById('postTitle');
+    const postContent = document.getElementById('postContent');
+    const postImage = document.getElementById('postImage');
+
+    let currentUser = null;
+    let globalUserName = "Student";
+    let currentFilter = 'all';
+    let unsubscribeFeed = null;
+
+    // --- Auth State Logic ---
+    async function checkAuth() {
+        try {
+            const user = await account.get();
+            currentUser = user;
+            
+            try {
+                // Fetch profile document from Appwrite Profiles collection
+                const userDoc = await db.getDocument(APPWRITE_DB_ID, APPWRITE_COL_PROFILES, currentUser.$id);
+                if (userDoc && userDoc.firstName) {
+                    globalUserName = `${userDoc.firstName} ${userDoc.lastName || ''}`.trim();
+                } else if (user.email) {
+                    globalUserName = user.email.split('@')[0];
+                }
+            } catch (e) {
+                console.error("Error retrieving user data from Appwrite:", e);
+                globalUserName = user.email ? user.email.split('@')[0] : "Student";
+            }
+
+            document.getElementById('userNameDisplay').textContent = globalUserName;
+            document.getElementById('userAvatar').textContent = globalUserName.charAt(0).toUpperCase();
+
+            loadCommunityFeed();
+        } catch (error) {
+            console.error("User not authenticated:", error);
+            window.location.href = "login.html";
+        }
+    }
+
+    // Run auth state evaluation
+    checkAuth();
+
+    // --- Modal Logic ---
+    btnOpenModal.onclick = () => {
+        modalOverlay.style.display = 'block';
+        addEntryModal.style.display = 'block';
+    };
+
+    const closeModal = () => {
+        modalOverlay.style.display = 'none';
+        addEntryModal.style.display = 'none';
+        postTitle.value = '';
+        postContent.value = '';
+        postImage.value = '';
+    };
+
+    btnCloseModal.onclick = closeModal;
+    modalOverlay.onclick = closeModal;
+
+    // --- PRIME STANDARD 2: FIRESTORE & STORAGE SYNC ---
+    btnSubmitPost.onclick = async () => {
+        const file = postImage.files[0];
+        const titleVal = postTitle.value.trim();
+        const contentVal = postContent.value.trim();
+
+        if (!titleVal || !contentVal) {
+            alert("Please provide both a Title and Content.");
+            return;
+        }
+
+        btnSubmitPost.innerText = "Processing...";
+        btnSubmitPost.disabled = true;
+
+        try {
+            let downloadURL = null;
+
+            // 1. Upload File to Storage FIRST (if attached)
+            if (file) {
+                btnSubmitPost.innerText = "Uploading Media...";
+                const uploadResponse = await storage.createFile(
+                    APPWRITE_BUCKET_ID,
+                    ID.unique(),
+                    file
+                );
+                
+                // 2. Wait for downloadURL
+                downloadURL = storage.getFileView(APPWRITE_BUCKET_ID, uploadResponse.$id).href;
+            }
+
+            btnSubmitPost.innerText = "Saving to Appwrite...";
+
+            // 3. Save to Database Collection
+            await db.createDocument(
+                APPWRITE_DB_ID,
+                APPWRITE_COL_COMMUNITY,
+                ID.unique(),
+                {
+                    uid: currentUser.$id,
+                    author: globalUserName,
+                    title: titleVal,
+                    content: contentVal,
+                    imageUrl: downloadURL,
+                    upvotes: 0,
+                    commentCount: 0,
+                    timestamp: new Date().toISOString()
+                }
+            );
+
+            closeModal();
+        } catch (error) {
+            console.error("Error creating post inside Appwrite:", error);
+            alert("Failed to publish post. Verify that the community collection and storage bucket exist.");
+        } finally {
+            btnSubmitPost.innerText = "Publish Post";
+            btnSubmitPost.disabled = false;
+        }
+    };
+
+    // --- PRIME STANDARD 3: DUAL-VIEW FILTER LOGIC ---
+    btnAllItems.onclick = () => {
+        if (currentFilter === 'all') return;
+        currentFilter = 'all';
+        btnAllItems.classList.add('active');
+        btnMyItems.classList.remove('active');
+        loadCommunityFeed();
+    };
+
+    btnMyItems.onclick = () => {
+        if (currentFilter === 'mine') return;
+        currentFilter = 'mine';
+        btnMyItems.classList.add('active');
+        btnAllItems.classList.remove('active');
+        loadCommunityFeed();
+    };
+
+    // --- UI FEED WITH REAL-TIME LISTENER ---
+    async function loadCommunityFeed() {
+        if (unsubscribeFeed) {
+            unsubscribeFeed();
+            unsubscribeFeed = null;
+        }
+
+        async function fetchAndRender() {
+            try {
+                let queries = [
+                    Query.limit(100)
+                ];
+
+                if (currentFilter === 'mine') {
+                    queries.push(Query.equal('uid', currentUser.$id));
+                }
+
+                const response = await db.listDocuments(
+                    APPWRITE_DB_ID,
+                    APPWRITE_COL_COMMUNITY,
+                    queries
+                );
+
+                threadContainer.innerHTML = '';
+
+                if (response.documents.length === 0) {
+                    threadContainer.innerHTML = `
+                        <div class="empty-state">
+                            <h3>No posts found</h3>
+                            <p>Start a discussion or share an update.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                const posts = response.documents;
+
+                // Client-side sort by newest
+                posts.sort((a, b) => {
+                    const timeA = a.timestamp ? new Date(a.timestamp).getTime() : Date.now();
+                    const timeB = b.timestamp ? new Date(b.timestamp).getTime() : Date.now();
+                    return timeB - timeA;
+                });
+
+                posts.forEach(post => renderPostCard(post));
+            } catch (error) {
+                console.error("Error retrieving community posts:", error);
+                threadContainer.innerHTML = `<div class="empty-state">Error loading feed. Confirm that the 'community' collection permissions allow access.</div>`;
+            }
+        }
+
+        // Run primary query execution
+        await fetchAndRender();
+
+        // Subscribe to feed database collection changes
+        try {
+            unsubscribeFeed = client.subscribe(
+                `databases.${APPWRITE_DB_ID}.collections.${APPWRITE_COL_COMMUNITY}.documents`,
+                (response) => {
+                    const events = response.events;
+                    if (events.some(event => event.includes('.create') || event.includes('.update') || event.includes('.delete'))) {
+                        fetchAndRender();
+                    }
+                }
+            );
+        } catch (err) {
+            console.error("Failed to establish feed real-time listener:", err);
+        }
+    }
+
+    function renderPostCard(post) {
+        const timeVal = post.timestamp ? new Date(post.timestamp).getTime() : null;
+        const timeString = formatTimeAgo(timeVal);
+        const imageHtml = post.imageUrl ? `<img src="${post.imageUrl}" class="thread-image" alt="Post Attachment">` : '';
+
+        const cardHTML = `
+            <div class="thread-card">
+                <div class="vote-column">
+                    <button class="vote-btn upvote">▲</button>
+                    <span class="vote-count">${post.upvotes || 0}</span>
+                    <button class="vote-btn downvote">▼</button>
+                </div>
+                <div class="thread-content">
+                    <div class="thread-meta">
+                        <span class="thread-author">${post.author || 'Anonymous'}</span> • <span>${timeString}</span>
+                    </div>
+                    <h3 class="thread-title">${post.title}</h3>
+                    <p class="thread-preview">${post.content}</p>
+                    ${imageHtml}
+                    <div class="thread-tags">
+                        <span class="tag">Discussion</span>
+                        <span class="tag">Campus</span>
+                    </div>
+                    <div class="thread-footer">
+                        <div class="footer-action">💬 ${post.commentCount || 0} Comments</div>
+                        <div class="footer-action">↗️ Share</div>
+                        <div class="footer-action">🔖 Save</div>
+                    </div>
+                </div>
+            </div>
+        `;
+        threadContainer.insertAdjacentHTML('beforeend', cardHTML);
+    }
+
+    function formatTimeAgo(timestamp) {
+        if (!timestamp) return "Just now";
+        const seconds = Math.floor((Date.now() - timestamp) / 1000);
+        if (seconds < 60) return "Just now";
+        const minutes = Math.floor(seconds / 60);
+        if (minutes < 60) return `${minutes}m ago`;
+        const hours = Math.floor(minutes / 60);
+        if (hours < 24) return `${hours}h ago`;
+        const days = Math.floor(hours / 24);
+        return `${days}d ago`;
+    }
+
+    // --- Search Filter Logic ---
+    document.getElementById('forumSearch').onkeyup = function() {
+        const queryVal = this.value.toLowerCase();
+        const cards = document.querySelectorAll('.thread-card');
+        cards.forEach(card => {
+            const text = card.textContent.toLowerCase();
+            card.style.display = text.includes(queryVal) ? 'flex' : 'none';
+        });
+    };
+
+    // Logout Action
+    document.getElementById('logoutBtn').onclick = async () => {
+        try {
+            await account.deleteSession('current');
+            window.location.href = "login.html";
+        } catch (error) {
+            console.error("Logout failure:", error);
+        }
+    };
+</script>
+<script type="module" src="notifications.js"></script>
+</body>
+</html>

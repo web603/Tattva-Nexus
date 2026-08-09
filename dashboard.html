@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard | Tattva Nexus</title>
+<style>
+/* Global Variables */
+:root {
+--bg-color: #f3f4f6;
+--card-color: #ffffff;
+--primary-accent: #1e3a8a;
+--secondary-accent: #3b82f6;
+--text-color: #111827;
+--text-light: #4b5563;
+--border-color: #e5e7eb;
+--sidebar-width: 260px;
+--header-height: 70px;
+}
+/* Reset & Base */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        display: flex;
+        min-height: 100vh;
+        overflow-x: hidden;
+    }
+
+    /* Sidebar Container */
+    .sidebar {
+        width: var(--sidebar-width);
+        background-color: var(--card-color);
+        border-right: 1px solid var(--border-color);
+        position: fixed;
+        height: 100vh;
+        left: 0;
+        top: 0;
+        display: flex;
+        flex-direction: column;
+        z-index: 100;
+    }
+
+    /* Sidebar Header/Logo */
+    .sidebar-logo {
+        height: var(--header-height);
+        display: flex;
+        align-items: center;
+        padding: 0 1.5rem;
+        font-size: 1.25rem;
+        font-weight: 800;
+        color: var(--primary-accent);
+        border-bottom: 1px solid var(--border-color);
+        cursor: pointer;
+        flex-shrink: 0;
+    }
+
+    .logo-icon {
+        width: 32px;
+        height: 32px;
+        background-color: var(--secondary-accent);
+        color: white;
+        border-radius: 8px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-right: 10px;
+        font-weight: bold;
+    }
+
+    /* Navigation Links Container */
+    .nav-menu {
+        padding: 1.5rem 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        flex-grow: 1;
+        overflow-y: auto;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+
+    .nav-menu::-webkit-scrollbar {
+        display: none;
+    }
+
+    .nav-item {
+        display: flex;
+        align-items: center;
+        padding: 0.875rem 1rem;
+        border-radius: 8px;
+        color: var(--text-light);
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .nav-item:hover {
+        background-color: var(--bg-color);
+        color: var(--primary-accent);
+    }
+
+    .nav-item.active {
+        background-color: rgba(59, 130, 246, 0.1);
+        color: var(--secondary-accent);
+        border-right: 3px solid var(--secondary-accent);
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+    }
+
+    .nav-icon {
+        margin-right: 12px;
+        font-size: 1.1rem;
+    }
+
+    .logout-item {
+        margin-top: auto;
+        color: #dc2626 !important;
+        margin-bottom: 1.5rem;
+    }
+
+    .logout-item:hover {
+        background-color: #fef2f2 !important;
+    }
+
+    /* Top Header */
+    .top-header {
+        position: fixed;
+        top: 0;
+        left: var(--sidebar-width);
+        right: 0;
+        height: var(--header-height);
+        background-color: var(--card-color);
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 2rem;
+        z-index: 90;
+    }
+
+    .page-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--text-color);
+    }
+
+    .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+    }
+
+    .search-bar {
+        position: relative;
+    }
+
+    .search-bar input {
+        padding: 0.5rem 1rem 0.5rem 2.5rem;
+        border: 1px solid var(--border-color);
+        border-radius: 20px;
+        outline: none;
+        width: 250px;
+        font-size: 0.9rem;
+        background-color: var(--bg-color);
+        transition: width 0.3s ease, border-color 0.3s ease;
+    }
+
+    .search-bar input:focus {
+        width: 300px;
+        border-color: var(--secondary-accent);
+        background-color: white;
+    }
+
+    .search-bar::before {
+        content: '🔍';
+        position: absolute;
+        left: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 0.9rem;
+        opacity: 0.6;
+    }
+
+    .user-profile {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        cursor: pointer;
+    }
+
+    .avatar {
+        width: 40px;
+        height: 40px;
+        background-color: var(--primary-accent);
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-weight: 600;
+        font-size: 1rem;
+        text-transform: uppercase;
+    }
+
+    .user-info span {
+        display: block;
+        font-size: 0.875rem;
+        font-weight: 600;
+    }
+
+    .user-info small {
+        color: var(--text-light);
+        font-size: 0.75rem;
+    }
+
+    /* Main Content */
+    .main-content {
+        margin-left: var(--sidebar-width);
+        margin-top: var(--header-height);
+        padding: 2rem;
+        width: calc(100% - var(--sidebar-width));
+    }
+
+    .welcome-banner {
+        margin-bottom: 2rem;
+    }
+
+    .welcome-banner h1 {
+        font-size: 1.75rem;
+        color: var(--primary-accent);
+        margin-bottom: 0.25rem;
+    }
+
+    .welcome-banner p {
+        color: var(--text-light);
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .stat-card {
+        background-color: var(--card-color);
+        padding: 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        border: 1px solid var(--border-color);
+        display: flex;
+        align-items: center;
+        gap: 1.25rem;
+    }
+
+    .stat-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 10px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 1.5rem;
+    }
+
+    .stat-info h3 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--text-color);
+        margin-bottom: 0.25rem;
+    }
+
+    .stat-info p {
+        font-size: 0.875rem;
+        color: var(--text-light);
+        font-weight: 500;
+    }
+
+    .c-gigs { background-color: rgba(59, 130, 246, 0.1); color: var(--secondary-accent); }
+    .c-notes { background-color: rgba(16, 185, 129, 0.1); color: #10b981; }
+    .c-sales { background-color: rgba(245, 158, 11, 0.1); color: #f59e0b; }
+    .c-events { background-color: rgba(139, 92, 246, 0.1); color: #8b5cf6; }
+
+    /* Content Layout */
+    .dashboard-content {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 1.5rem;
+    }
+
+    .panel {
+        background-color: var(--card-color);
+        border-radius: 12px;
+        border: 1px solid var(--border-color);
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        overflow: hidden;
+    }
+
+    .panel-header {
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .panel-header h2 {
+        font-size: 1.125rem;
+        color: var(--text-color);
+    }
+
+    .view-all {
+        font-size: 0.875rem;
+        color: var(--secondary-accent);
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+    .view-all:hover {
+        text-decoration: underline;
+    }
+
+    .task-list { list-style: none; }
+
+    .task-item {
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: background-color 0.2s;
+    }
+
+    .task-item:hover {
+        background-color: var(--bg-color);
+    }
+
+    .task-item:last-child { border-bottom: none; }
+
+    .task-details h4 {
+        font-size: 1rem;
+        color: var(--text-color);
+        margin-bottom: 0.25rem;
+    }
+
+    .task-details p {
+        font-size: 0.875rem;
+        color: var(--text-light);
+        display: flex;
+        gap: 1rem;
+    }
+
+    .badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 50px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: capitalize;
+    }
+
+    .badge.in-progress { background-color: rgba(59, 130, 246, 0.1); color: var(--secondary-accent); }
+    .badge.pending { background-color: rgba(245, 158, 11, 0.1); color: #f59e0b; }
+    .badge.completed { background-color: rgba(16, 185, 129, 0.1); color: #10b981; }
+
+    .event-list { padding: 1rem; }
+
+    .event-card {
+        display: flex;
+        gap: 1rem;
+        padding: 1rem;
+        background-color: var(--bg-color);
+        border-radius: 8px;
+        margin-bottom: 1rem;
+    }
+
+    .event-card:last-child { margin-bottom: 0; }
+
+    .event-date {
+        background-color: white;
+        min-width: 50px;
+        text-align: center;
+        border-radius: 6px;
+        padding: 0.5rem;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .event-date span:first-child {
+        font-size: 0.75rem;
+        color: var(--primary-accent);
+        text-transform: uppercase;
+        font-weight: 700;
+    }
+
+    .event-date span:last-child {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--text-color);
+    }
+
+    .event-info h4 {
+        font-size: 0.95rem;
+        color: var(--text-color);
+        margin-bottom: 0.25rem;
+    }
+
+    .event-info p {
+        font-size: 0.8rem;
+        color: var(--text-light);
+    }
+
+    /* PRIME STANDARD 1: HARDCORE CSS MODAL */
+    .modal-overlay { 
+        position: fixed; 
+        top: 0; 
+        left: 0; 
+        width: 100%; 
+        height: 100%; 
+        background: rgba(0,0,0,0.85); 
+        backdrop-filter: blur(8px); 
+        z-index: 9998; 
+        display: none; 
+    }
+
+    .add-entry-modal { 
+        position: fixed; 
+        top: 50%; 
+        left: 50%; 
+        transform: translate(-50%, -50%); 
+        z-index: 9999; 
+        background: #fff; 
+        max-height: 90vh; 
+        overflow-y: auto; 
+        display: none; 
+        width: 90%; 
+        max-width: 500px; 
+        padding: 2.5rem; 
+        border-radius: 12px;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    }
+    
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .modal-header h2 {
+        font-size: 1.5rem;
+        color: var(--primary-accent);
+    }
+
+    .close-modal {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: var(--text-light);
+    }
+
+    .form-group { margin-bottom: 1.25rem; }
+    .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 600; font-size: 0.9rem; color: var(--text-color); }
+    .form-control {
+        width: 100%; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 8px; font-size: 1rem; outline: none; transition: border-color 0.2s;
+    }
+    .form-control:focus { border-color: var(--secondary-accent); }
+    textarea.form-control { resize: vertical; min-height: 100px; }
+
+    .btn-submit {
+        width: 100%; padding: 1rem; background-color: var(--primary-accent); color: white; border: none; border-radius: 8px; font-size: 1.1rem; font-weight: 700; cursor: pointer; transition: background-color 0.2s; margin-top: 1rem;
+    }
+    .btn-submit:hover { background-color: #172554; }
+    .btn-submit:disabled { background-color: var(--text-light); cursor: not-allowed; }
+
+</style>
+</head>
+<body>
+<!-- Sidebar -->
+<aside class="sidebar">
+    <div class="sidebar-logo" onclick="window.location.href='index.html'">
+        <div class="logo-icon">T</div>
+        Tattva Nexus
+    </div>
+    <nav class="nav-menu">
+        <div class="nav-item active" onclick="window.location.href='dashboard.html'">
+            <span class="nav-icon">📊</span> Dashboard
+        </div>
+        <div class="nav-item" onclick="window.location.href='gigs.html'">
+            <span class="nav-icon">💼</span> Gigs
+        </div>
+        <div class="nav-item" onclick="window.location.href='notes.html'">
+            <span class="nav-icon">📚</span> Notes
+        </div>
+        <div class="nav-item" onclick="window.location.href='marketplace.html'">
+            <span class="nav-icon">🛒</span> Marketplace
+        </div>
+        <div class="nav-item" onclick="window.location.href='events.html'">
+            <span class="nav-icon">📅</span> Events
+        </div>
+        <div class="nav-item" onclick="window.location.href='community.html'">
+            <span class="nav-icon">👥</span> Community
+        </div>
+        <div class="nav-item" onclick="window.location.href='messages.html'">
+            <span class="nav-icon">💬</span> Messages
+        </div>
+        <div class="nav-item" onclick="window.location.href='profile.html'">
+            <span class="nav-icon">👤</span> Profile
+        </div>
+
+        <div class="nav-item logout-item" id="logoutBtn">
+            <span class="nav-icon">🚪</span> Logout
+        </div>
+    </nav>
+</aside>
+
+<!-- Top Header -->
+<header class="top-header">
+    <div class="page-title">Dashboard</div>
+    <div class="header-actions">
+        <!-- Quick Action Add Button to invoke Modal globally -->
+        <button id="btnOpenModal" style="background-color:var(--secondary-accent); color:white; border:none; padding:0.5rem 1rem; border-radius:8px; font-weight:600; cursor:pointer;">
+            + Quick Post
+        </button>
+        <div class="search-bar">
+            <input type="text" placeholder="Search gigs, notes, items...">
+        </div>
+        <div class="user-profile" onclick="window.location.href='profile.html'">
+            <div class="user-info" style="text-align: right;">
+                <span id="headerUserName">...</span>
+                <small>Verified Student</small>
+            </div>
+            <div class="avatar" id="userAvatar">?</div>
+        </div>
+    </div>
+</header>
+
+<!-- Main Content -->
+<main class="main-content">
+    
+    <div class="welcome-banner">
+        <h1 id="welcomeHeader">Welcome back! 👋</h1>
+        <p>Here is an overview of your activity and campus feed.</p>
+    </div>
+
+    <!-- Statistics -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon c-gigs">💼</div>
+            <div class="stat-info">
+                <h3 id="activeGigsCount">0</h3>
+                <p>My Gigs</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon c-notes">📚</div>
+            <div class="stat-info">
+                <h3 id="notesCount">0</h3>
+                <p>My Notes Uploaded</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon c-sales">🛒</div>
+            <div class="stat-info">
+                <h3 id="marketItemsCount">0</h3>
+                <p>Market Items</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon c-events">📅</div>
+            <div class="stat-info">
+                <h3 id="upcomingEventsCount">0</h3>
+                <p>My Events Hosted</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard Panels -->
+    <div class="dashboard-content">
+        
+        <!-- My Recent Gigs / Tasks panel -->
+        <div class="panel">
+            <div class="panel-header">
+                <h2>Your Recent Gigs</h2>
+                <a href="gigs.html" class="view-all">Manage All</a>
+            </div>
+            <ul class="task-list" id="recentGigsContainer">
+                <li class="task-item">
+                    <p style="color: var(--text-light);">Loading recent gigs...</p>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Schedule / Events Panel -->
+        <div class="panel">
+            <div class="panel-header">
+                <h2>Your Hosted Events</h2>
+                <a href="events.html" class="view-all">View All</a>
+            </div>
+            <div class="event-list" id="scheduleContainer">
+                <p style="padding: 1rem; color: var(--text-light);">Loading schedule...</p>
+            </div>
+        </div>
+
+    </div>
+
+</main>
+
+<!-- PRIME STANDARD 1: HARDCORE CSS MODAL (Global Quick Post for Dashboard) -->
+<div class="modal-overlay" id="modalOverlay"></div>
+<div class="add-entry-modal" id="addEntryModal">
+    <div class="modal-header">
+        <h2>Quick Post to Feed</h2>
+        <button class="close-modal" id="btnCloseModal">&times;</button>
+    </div>
+    
+    <div class="form-group">
+        <label for="postTitle">Update Title</label>
+        <input type="text" id="postTitle" class="form-control" placeholder="What's happening?" required>
+    </div>
+
+    <div class="form-group">
+        <label for="postDesc">Details</label>
+        <textarea id="postDesc" class="form-control" placeholder="Share an update with your campus..." required></textarea>
+    </div>
+
+    <div class="form-group">
+        <label for="postFile">Upload Media (Optional)</label>
+        <input type="file" id="postFile" class="form-control" accept="image/*">
+    </div>
+
+    <button id="btnSubmitEntry" class="btn-submit">Post to Feed</button>
+</div>
+
+<!-- Appwrite SDK Logic -->
+<script type="module">
+    import { Client, Account, Databases, Storage, Query, ID } from "https://cdn.jsdelivr.net/npm/appwrite@14.0.1/+esm";
+
+    // Configuration setup
+    const APPWRITE_ENDPOINT = "https://sgp.cloud.appwrite.io/v1";
+    const APPWRITE_PROJECT_ID = "6a21633800287cda70c6";
+    const APPWRITE_DB_ID = "6a21640d001592135482";
+    const APPWRITE_COL_PROFILES = "profiles";
+    const APPWRITE_COL_GIGS = "gigs";
+    const APPWRITE_COL_NOTES = "notes";
+    const APPWRITE_COL_MARKETPLACE = "marketplace";
+    const APPWRITE_COL_EVENTS = "events";
+    const APPWRITE_COL_FEED = "feed";
+    const APPWRITE_BUCKET_ID = "feed_media"; // Make sure to configure this storage bucket in your Appwrite Console
+
+    // Initialize Appwrite Client
+    const client = new Client()
+        .setEndpoint(APPWRITE_ENDPOINT)
+        .setProject(APPWRITE_PROJECT_ID);
+
+    const account = new Account(client);
+    const db = new Databases(client);
+    const storage = new Storage(client);
+
+    // State Variables
+    let currentUser = null;
+    let currentUserName = "Student";
+
+    // UI Element References
+    const headerUserName = document.getElementById('headerUserName');
+    const userAvatar = document.getElementById('userAvatar');
+    const welcomeHeader = document.getElementById('welcomeHeader');
+    const logoutBtn = document.getElementById('logoutBtn');
+    
+    // Stats Elements
+    const activeGigsCountEl = document.getElementById('activeGigsCount');
+    const notesCountEl = document.getElementById('notesCount');
+    const marketItemsCountEl = document.getElementById('marketItemsCount');
+    const upcomingEventsCountEl = document.getElementById('upcomingEventsCount');
+
+    // Containers
+    const recentGigsContainer = document.getElementById('recentGigsContainer');
+    const scheduleContainer = document.getElementById('scheduleContainer');
+
+    // Modal References
+    const btnOpenModal = document.getElementById('btnOpenModal');
+    const btnCloseModal = document.getElementById('btnCloseModal');
+    const modalOverlay = document.getElementById('modalOverlay');
+    const addEntryModal = document.getElementById('addEntryModal');
+    const btnSubmitEntry = document.getElementById('btnSubmitEntry');
+    const postTitle = document.getElementById('postTitle');
+    const postDesc = document.getElementById('postDesc');
+    const postFile = document.getElementById('postFile');
+
+    // Helper formatting
+    function formatName(name) {
+        if (!name || name.trim() === "") return "User";
+        return name.toLowerCase()
+            .split(' ')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(' ');
+    }
+
+    function updateUIHeader(name) {
+        const formattedName = formatName(name);
+        const firstName = formattedName.split(' ')[0];
+        headerUserName.innerText = formattedName;
+        userAvatar.innerText = firstName.charAt(0).toUpperCase();
+        welcomeHeader.innerText = `Welcome back, ${firstName}! 👋`;
+    }
+
+    // Modal Logic
+    btnOpenModal.onclick = () => {
+        modalOverlay.style.display = 'block';
+        addEntryModal.style.display = 'block';
+    };
+
+    const closeModal = () => {
+        modalOverlay.style.display = 'none';
+        addEntryModal.style.display = 'none';
+        postTitle.value = '';
+        postDesc.value = '';
+        postFile.value = '';
+    };
+
+    btnCloseModal.onclick = closeModal;
+    modalOverlay.onclick = closeModal;
+
+    // --- PRIME STANDARD 2: FIRESTORE & STORAGE SYNC ---
+    btnSubmitEntry.onclick = async () => {
+        const file = postFile.files[0];
+        const titleVal = postTitle.value.trim();
+        const descVal = postDesc.value.trim();
+
+        if (!titleVal || !descVal) {
+            alert("Please fill in Title and Details.");
+            return;
+        }
+
+        btnSubmitEntry.innerText = "Processing...";
+        btnSubmitEntry.disabled = true;
+
+        try {
+            let downloadURL = null;
+
+            // Handle file upload if present
+            if (file) {
+                btnSubmitEntry.innerText = "Uploading Media...";
+                const uploadResponse = await storage.createFile(
+                    APPWRITE_BUCKET_ID,
+                    ID.unique(),
+                    file
+                );
+                downloadURL = storage.getFileView(APPWRITE_BUCKET_ID, uploadResponse.$id).href;
+            }
+            
+            btnSubmitEntry.innerText = "Saving to Feed...";
+
+            // Save to Appwrite Database Collection
+            await db.createDocument(
+                APPWRITE_DB_ID,
+                APPWRITE_COL_FEED,
+                ID.unique(),
+                {
+                    uid: currentUser.$id,
+                    authorName: currentUserName,
+                    title: titleVal,
+                    description: descVal,
+                    imageUrl: downloadURL,
+                    createdAt: new Date().toISOString()
+                }
+            );
+
+            closeModal();
+            alert("Posted successfully! (Check community feed)");
+        } catch (error) {
+            console.error("Error creating entry inside Appwrite:", error);
+            alert("Failed to post. Check database configuration permissions.");
+        } finally {
+            btnSubmitEntry.innerText = "Post to Feed";
+            btnSubmitEntry.disabled = false;
+        }
+    };
+
+    /**
+     * Dashboard Data Loading - Queries collections where uid == currentUser.$id
+     */
+    function loadDashboardData(uid) {
+        
+        // 1. Stats and Recent Gigs (PRIME STANDARD 3 LOGIC)
+        const fetchGigs = async () => {
+            try {
+                const response = await db.listDocuments(
+                    APPWRITE_DB_ID,
+                    APPWRITE_COL_GIGS,
+                    [Query.equal("uid", uid), Query.limit(100)]
+                );
+                activeGigsCountEl.innerText = response.total;
+                recentGigsContainer.innerHTML = '';
+                
+                if (response.documents.length === 0) {
+                    recentGigsContainer.innerHTML = '<li class="task-item"><p style="color: var(--text-light);">No recent gigs found.</p></li>';
+                    return;
+                }
+
+                const docs = response.documents.slice(0, 3); // Max 3 on dashboard
+                docs.forEach(data => {
+                    const price = data.price ? `₹${data.price}` : 'Custom';
+                    const li = document.createElement('li');
+                    li.className = 'task-item';
+                    li.innerHTML = `
+                        <div class="task-details">
+                            <h4>${data.title}</h4>
+                            <p><span>Category: ${data.category || 'Service'}</span> <span>Price: ${price}</span></p>
+                        </div>
+                        <span class="badge pending">Active</span>
+                    `;
+                    recentGigsContainer.appendChild(li);
+                });
+            } catch (error) {
+                console.error("Error fetching gigs:", error);
+                recentGigsContainer.innerHTML = '<li class="task-item"><p style="color: var(--text-light);">Failed to load gigs.</p></li>';
+            }
+        };
+
+        // 2. Stats: Notes
+        const fetchNotes = async () => {
+            try {
+                const response = await db.listDocuments(
+                    APPWRITE_DB_ID,
+                    APPWRITE_COL_NOTES,
+                    [Query.equal("uid", uid), Query.limit(1)]
+                );
+                notesCountEl.innerText = response.total;
+            } catch (error) {
+                console.error("Error fetching notes:", error);
+            }
+        };
+
+        // 3. Stats: Marketplace
+        const fetchMarket = async () => {
+            try {
+                const response = await db.listDocuments(
+                    APPWRITE_DB_ID,
+                    APPWRITE_COL_MARKETPLACE,
+                    [Query.equal("uid", uid), Query.limit(1)]
+                );
+                marketItemsCountEl.innerText = response.total;
+            } catch (error) {
+                console.error("Error fetching marketplace items:", error);
+            }
+        };
+
+        // 4. Stats and Events Schedule
+        const fetchEvents = async () => {
+            try {
+                const response = await db.listDocuments(
+                    APPWRITE_DB_ID,
+                    APPWRITE_COL_EVENTS,
+                    [Query.equal("uid", uid), Query.limit(100)]
+                );
+                upcomingEventsCountEl.innerText = response.total;
+                scheduleContainer.innerHTML = '';
+
+                if (response.documents.length === 0) {
+                    scheduleContainer.innerHTML = '<p style="padding: 1rem; color: var(--text-light);">No events hosted by you.</p>';
+                    return;
+                }
+
+                const docs = response.documents.slice(0, 3); // Show max 3 events
+                docs.forEach(data => {
+                    let displayMonth = "TBD";
+                    let displayDay = "--";
+                    if (data.eventDate) {
+                        const dObj = new Date(data.eventDate);
+                        displayMonth = dObj.toLocaleString('default', { month: 'short' });
+                        displayDay = dObj.getDate();
+                    }
+
+                    const div = document.createElement('div');
+                    div.className = 'event-card';
+                    div.innerHTML = `
+                        <div class="event-date">
+                            <span>${displayMonth}</span>
+                            <span>${displayDay}</span>
+                        </div>
+                        <div class="event-info">
+                            <h4>${data.title}</h4>
+                            <p>📍 ${data.location || 'Campus'}</p>
+                        </div>
+                    `;
+                    scheduleContainer.appendChild(div);
+                });
+            } catch (error) {
+                console.error("Error fetching events:", error);
+                scheduleContainer.innerHTML = '<p style="padding: 1rem; color: var(--text-light);">Failed to load schedule.</p>';
+            }
+        };
+
+        // Execute queries
+        fetchGigs();
+        fetchNotes();
+        fetchMarket();
+        fetchEvents();
+
+        // Subscribe to relevant database collections for dynamic real-time updates
+        try {
+            client.subscribe([
+                `databases.${APPWRITE_DB_ID}.collections.${APPWRITE_COL_GIGS}.documents`,
+                `databases.${APPWRITE_DB_ID}.collections.${APPWRITE_COL_NOTES}.documents`,
+                `databases.${APPWRITE_DB_ID}.collections.${APPWRITE_COL_MARKETPLACE}.documents`,
+                `databases.${APPWRITE_DB_ID}.collections.${APPWRITE_COL_EVENTS}.documents`
+            ], (response) => {
+                const events = response.events;
+                if (events.some(e => e.includes('.create') || e.includes('.update') || e.includes('.delete'))) {
+                    fetchGigs();
+                    fetchNotes();
+                    fetchMarket();
+                    fetchEvents();
+                }
+            });
+        } catch (err) {
+            console.error("Realtime subscription setup failed:", err);
+        }
+    }
+
+    // Auth Initialization check
+    async function checkAuth() {
+        try {
+            const user = await account.get();
+            currentUser = user;
+            
+            try {
+                const userSnap = await db.getDocument(APPWRITE_DB_ID, APPWRITE_COL_PROFILES, user.$id);
+                if (userSnap && userSnap.firstName) {
+                    currentUserName = `${userSnap.firstName || ''} ${userSnap.lastName || ''}`.trim() || "Student";
+                } else if (user.email) {
+                    currentUserName = user.email.split('@')[0];
+                }
+            } catch (e) { 
+                console.error("Database user profiles directory lookup failed:", e); 
+                currentUserName = user.email ? user.email.split('@')[0] : "Student";
+            }
+
+            updateUIHeader(currentUserName);
+            loadDashboardData(user.$id);
+
+        } else {
+            window.location.href = 'login.html';
+        }
+    }
+
+    checkAuth();
+
+    // Logout logic
+    logoutBtn.addEventListener('click', async () => {
+        try {
+            await account.deleteSession('current');
+            window.location.href = 'login.html';
+        } catch (error) {
+            console.error("Logout verification failed:", error);
+        }
+    });
+</script>
+<script type="module" src="notifications.js"></script>
+</body>
+</html>

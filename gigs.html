@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gig Marketplace | Tattva Nexus</title>
+    <style>
+        /* ================================================================
+           1. GLOBAL VARIABLES & THEME
+           ================================================================ */
+        :root {
+            --bg-color: #f3f4f6;
+            --card-color: #ffffff;
+            --primary-accent: #1e3a8a;
+            --secondary-accent: #3b82f6;
+            --text-color: #111827;
+            --text-light: #4b5563;
+            --border-color: #e5e7eb;
+            --sidebar-width: 260px;
+            --header-height: 70px;
+            --transition-speed: 0.3s;
+        }
+
+        /* ================================================================
+           2. BASE RESET
+           ================================================================ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ================================================================
+           3. SIDEBAR NAVIGATION
+           ================================================================ */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--card-color);
+            border-right: 1px solid var(--border-color);
+            position: fixed;
+            height: 100vh; 
+            left: 0;
+            top: 0;
+            display: flex; 
+            flex-direction: column; 
+            z-index: 100;
+        }
+
+        .sidebar-logo {
+            height: var(--header-height);
+            display: flex;
+            align-items: center;
+            padding: 0 1.5rem;
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--primary-accent);
+            border-bottom: 1px solid var(--border-color);
+            cursor: pointer;
+            flex-shrink: 0; 
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background-color: var(--secondary-accent);
+            color: white;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+
+        .nav-menu {
+            padding: 1.5rem 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            flex-grow: 1; 
+            overflow-y: auto; 
+            scrollbar-width: none; 
+            -ms-overflow-style: none; 
+        }
+
+        .nav-menu::-webkit-scrollbar {
+            display: none; 
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 0.875rem 1rem;
+            border-radius: 8px;
+            color: var(--text-light);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all var(--transition-speed) ease;
+            text-decoration: none;
+        }
+
+        .nav-item:hover {
+            background-color: var(--bg-color);
+            color: var(--primary-accent);
+        }
+
+        .nav-item.active {
+            background-color: rgba(59, 130, 246, 0.1);
+            color: var(--secondary-accent);
+            border-right: 3px solid var(--secondary-accent);
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+
+        .nav-icon {
+            margin-right: 12px;
+            font-size: 1.1rem;
+        }
+
+        .logout-item {
+            margin-top: auto;
+            color: #dc2626 !important;
+            margin-bottom: 1.5rem;
+        }
+
+        .logout-item:hover {
+            background-color: #fef2f2 !important;
+        }
+
+        /* ================================================================
+           4. TOP HEADER
+           ================================================================ */
+        .top-header {
+            position: fixed;
+            top: 0;
+            left: var(--sidebar-width);
+            right: 0;
+            height: var(--header-height);
+            background-color: var(--card-color);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+            z-index: 90;
+        }
+
+        .page-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            cursor: pointer;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            background-color: var(--primary-accent);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .user-info span {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .user-info small {
+            color: var(--text-light);
+            font-size: 0.75rem;
+        }
+
+        /* ================================================================
+           5. MAIN CONTENT AREA
+           ================================================================ */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            margin-top: var(--header-height);
+            padding: 2rem;
+            width: calc(100% - var(--sidebar-width));
+        }
+
+        .gig-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .btn-post {
+            background-color: var(--primary-accent);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .btn-post:hover {
+            background-color: #172554;
+        }
+
+        /* ================================================================
+           6. TABS & FILTERS
+           ================================================================ */
+        .tabs-container {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .tab-item {
+            padding: 10px 5px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: var(--text-light);
+            cursor: pointer;
+            position: relative;
+            transition: color 0.3s;
+        }
+
+        .tab-item.active {
+            color: var(--secondary-accent);
+        }
+
+        .tab-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: var(--secondary-accent);
+            border-radius: 3px 3px 0 0;
+        }
+
+        .filters-card {
+            background-color: var(--card-color);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 2rem;
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .filter-group label {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-light);
+        }
+
+        .filter-group select, .filter-group input {
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            outline: none;
+            background-color: var(--bg-color);
+            font-size: 0.9rem;
+            color: var(--text-color);
+            transition: border-color 0.3s ease;
+        }
+
+        .filter-group input:focus, .filter-group select:focus {
+            border-color: var(--secondary-accent);
+            background-color: white;
+        }
+
+        /* ================================================================
+           7. GIGS GRID & CARDS
+           ================================================================ */
+        .gigs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .gig-card {
+            background-color: var(--card-color);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            transition: box-shadow 0.3s ease, transform 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            animation: fadeIn 0.4s ease;
+            overflow: hidden;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .gig-card:hover {
+            box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.1);
+            transform: translateY(-4px);
+        }
+
+        .gig-image {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            background-color: #e5e7eb;
+        }
+
+        .gig-content {
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .gig-author {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .author-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: var(--secondary-accent);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 0.75rem;
+            font-weight: bold;
+            color: white;
+            text-transform: uppercase;
+        }
+
+        .author-info span {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .author-info small {
+            color: var(--text-light);
+            font-size: 0.75rem;
+        }
+
+        .gig-title {
+            font-size: 1.125rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--text-color);
+        }
+
+        .gig-desc {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            margin-bottom: 1rem;
+            line-height: 1.5;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            flex-grow: 1;
+        }
+
+        .gig-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            align-items: center;
+        }
+
+        .tag {
+            padding: 0.25rem 0.75rem;
+            background-color: rgba(59, 130, 246, 0.1);
+            color: var(--secondary-accent);
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: capitalize;
+        }
+
+        .tag-delivery {
+            padding: 0.25rem 0.75rem;
+            background-color: #f3f4f6;
+            color: var(--text-light);
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .gig-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid var(--border-color);
+            padding-top: 1rem;
+            gap: 0.5rem;
+        }
+
+        .gig-price {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--primary-accent);
+        }
+
+        .btn-view {
+            background-color: var(--secondary-accent);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: background-color 0.3s;
+        }
+
+        .btn-view:hover {
+            background-color: var(--primary-accent);
+        }
+
+        .btn-edit {
+            background-color: #f3f4f6;
+            color: var(--primary-accent);
+            border: 1px solid var(--border-color);
+            padding: 0.5rem 0.8rem;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-delete {
+            background-color: #fef2f2;
+            color: #dc2626;
+            border: 1px solid #fee2e2;
+            padding: 0.5rem 0.8rem;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* ================================================================
+           8. HARDCORE MODAL ALIGNMENT (PRIME STANDARD 1)
+           ================================================================ */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(8px);
+            z-index: 9998;
+            display: none;
+        }
+
+        .modal-card {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 9999;
+            background: #fff;
+            max-height: 90vh;
+            overflow-y: auto;
+            width: 90%;
+            max-width: 600px;
+            border-radius: 12px;
+            display: none;
+            flex-direction: column;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid var(--border-color);
+            background: var(--card-color);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .modal-header h2 {
+            font-size: 1.5rem;
+            color: var(--primary-accent);
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.75rem;
+            cursor: pointer;
+            color: var(--text-light);
+        }
+
+        .modal-body {
+            padding: 1.5rem 2rem;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+            margin-bottom: 0;
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-color);
+        }
+
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            outline: none;
+            font-size: 1rem;
+            background-color: #f9fafb;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input[type="file"] {
+            padding: 0.5rem;
+        }
+
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+            border-color: var(--secondary-accent);
+            background-color: white;
+        }
+
+        .modal-footer {
+            padding: 1.5rem 2rem;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            background: var(--card-color);
+            position: sticky;
+            bottom: 0;
+            z-index: 10;
+        }
+
+        .btn-cancel {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .btn-submit-gig {
+            background-color: var(--secondary-accent);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+
+        .btn-submit-gig:hover {
+            background-color: var(--primary-accent);
+        }
+
+        .empty-state {
+            grid-column: 1 / -1;
+            padding: 4rem;
+            text-align: center;
+            border: 2px dashed var(--border-color);
+            border-radius: 12px;
+            color: var(--text-light);
+            background-color: var(--card-color);
+        }
+        
+        .empty-state h3 {
+            color: var(--primary-accent);
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- MODAL OVERLAY (PRIME STANDARD 1) -->
+    <div class="modal-overlay" id="gigOverlay" onclick="closePostModal()"></div>
+
+    <!-- MODAL CARD (PRIME STANDARD 1) -->
+    <div class="modal-card" id="gigModal">
+        <div class="modal-header">
+            <h2 id="modalTitle">Post a New Gig</h2>
+            <button class="close-modal" onclick="closePostModal()">&times;</button>
+        </div>
+        <form id="postGigForm">
+            <div class="modal-body">
+                <input type="hidden" id="editGigId">
+                <input type="hidden" id="editGigImageUrl">
+                <div class="form-group">
+                    <label for="modalGigTitle">Gig Title</label>
+                    <input type="text" id="modalGigTitle" placeholder="I will help you with..." required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="modalGigCategory">Category</label>
+                        <select id="modalGigCategory" required>
+                            <option value="tutoring">Tutoring & Academic</option>
+                            <option value="design">Design & Media</option>
+                            <option value="tech">Tech & Programming</option>
+                            <option value="writing">Writing & Translation</option>
+                            <option value="labor">Moving & Labor</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="modalGigPrice">Price (₹)</label>
+                        <input type="number" id="modalGigPrice" placeholder="e.g. 500" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="modalGigDelivery">Delivery Time</label>
+                        <select id="modalGigDelivery" required>
+                            <option value="1 Day">1 Day</option>
+                            <option value="2 Days">2 Days</option>
+                            <option value="3 Days">3 Days</option>
+                            <option value="1 Week">1 Week</option>
+                            <option value="Custom">Custom (Negotiable)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="modalGigFile">Cover Image (Upload)</label>
+                        <input type="file" id="modalGigFile" accept="image/*">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="modalGigDesc">Description</label>
+                    <textarea id="modalGigDesc" rows="5" placeholder="Detail exactly what you will provide in this gig..." required></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-cancel" onclick="closePostModal()">Cancel</button>
+                <button type="submit" class="btn-submit-gig" id="submitBtn">Post Gig</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-logo" onclick="window.location.href='index.html'">
+            <div class="logo-icon">T</div>
+            Tattva Nexus
+        </div>
+        <nav class="nav-menu">
+            <a href="dashboard.html" class="nav-item">
+                <span class="nav-icon">📊</span> Dashboard
+            </a>
+            <a href="gigs.html" class="nav-item active">
+                <span class="nav-icon">💼</span> Gigs
+            </a>
+            <a href="notes.html" class="nav-item">
+                <span class="nav-icon">📚</span> Notes
+            </a>
+            <a href="marketplace.html" class="nav-item">
+                <span class="nav-icon">🛒</span> Marketplace
+            </a>
+            <a href="events.html" class="nav-item">
+                <span class="nav-icon">📅</span> Events
+            </a>
+            <a href="community.html" class="nav-item">
+                <span class="nav-icon">👥</span> Community
+            </a>
+            <a href="messages.html" class="nav-item">
+                <span class="nav-icon">💬</span> Messages
+            </a>
+            <a href="profile.html" class="nav-item">
+                <span class="nav-icon">👤</span> Profile
+            </a>
+            <div class="nav-item logout-item" id="logoutBtn">
+                <span class="nav-icon">🚪</span> Logout
+            </div>
+        </nav>
+    </aside>
+
+    <!-- HEADER -->
+    <header class="top-header">
+        <div class="page-title">Gig Marketplace</div>
+        <div class="header-actions">
+            <div class="user-profile" onclick="window.location.href='profile.html'">
+                <div class="user-info" style="text-align: right;">
+                    <span id="userNameDisplay">Loading...</span>
+                    <small>College Student</small>
+                </div>
+                <div class="avatar" id="userAvatar">?</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN -->
+    <main class="main-content">
+        <div class="gig-header">
+            <div>
+                <h1 style="font-size: 1.8rem; color: var(--primary-accent); margin-bottom: 0.25rem;">Campus Services</h1>
+                <p style="color: var(--text-light); font-size: 0.95rem;">Hire peers for tech, design, tutoring, and more.</p>
+            </div>
+            <button class="btn-post" onclick="openPostModal()">
+                + Post a Gig
+            </button>
+        </div>
+
+        <!-- DUAL-VIEW FILTER LOGIC (PRIME STANDARD 3) -->
+        <div class="tabs-container">
+            <div class="tab-item active" id="tabAll" onclick="fetchGigs('all')">All Services</div>
+            <div class="tab-item" id="tabMine" onclick="fetchGigs('mine')">My Gigs</div>
+        </div>
+
+        <div class="filters-card">
+            <div class="filter-group" style="flex: 2;">
+                <label for="gigSearch">Search by Title</label>
+                <input type="text" id="gigSearch" placeholder="E.g. React Developer, Math Tutor..." oninput="filterAndRenderUI()">
+            </div>
+            <div class="filter-group">
+                <label for="categoryFilter">Filter by Category</label>
+                <select id="categoryFilter" onchange="filterAndRenderUI()">
+                    <option value="all">All Categories</option>
+                    <option value="tutoring">Tutoring & Academic</option>
+                    <option value="design">Design & Media</option>
+                    <option value="tech">Tech & Programming</option>
+                    <option value="writing">Writing & Translation</option>
+                    <option value="labor">Moving & Labor</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="sortFilter">Sort By</label>
+                <select id="sortFilter" onchange="filterAndRenderUI()">
+                    <option value="newest">Newest First</option>
+                    <option value="priceHigh">Price: High to Low</option>
+                    <option value="priceLow">Price: Low to High</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="gigs-grid" id="gigsContainer">
+            <!-- Dynamic Content populated by JS via listener -->
+        </div>
+    </main>
+
+    <!-- UI SCRIPTS -->
+    <script>
+        function closePostModal() {
+            document.getElementById('gigOverlay').style.display = 'none';
+            document.getElementById('gigModal').style.display = 'none';
+        }
+
+        window.openPostModal = function() {
+            document.getElementById('modalTitle').innerText = "Post a New Gig";
+            document.getElementById('submitBtn').innerText = "Publish Gig";
+            document.getElementById('editGigId').value = "";
+            document.getElementById('editGigImageUrl').value = "";
+            document.getElementById('postGigForm').reset();
+            
+            // Hardcore CSS Modal Reveal
+            document.getElementById('gigOverlay').style.display = 'block';
+            document.getElementById('gigModal').style.display = 'flex';
+        };
+    </script>
+
+    <!-- APPWRITE MODULE -->
+    <script type="module">
+        import { Client, Account, Databases, Storage, Query, ID } from "https://cdn.jsdelivr.net/npm/appwrite@14.0.1/+esm";
+
+        // CONFIGURATION
+        const APPWRITE_ENDPOINT = "https://sgp.cloud.appwrite.io/v1";
+        const APPWRITE_PROJECT_ID = "6a21633800287cda70c6";
+        const APPWRITE_DB_ID = "6a21640d001592135482";
+        const APPWRITE_COL_PROFILES = "profiles";
+        const APPWRITE_COL_GIGS = "gigs";
+        const APPWRITE_BUCKET_ID = "gig_media"; // Make sure to configure this storage bucket in your Appwrite Console
+
+        // Initialize Appwrite Client
+        const client = new Client()
+            .setEndpoint(APPWRITE_ENDPOINT)
+            .setProject(APPWRITE_PROJECT_ID);
+
+        const account = new Account(client);
+        const db = new Databases(client);
+        const storage = new Storage(client);
+
+        let activeUser = null;
+        let allGigs = [];
+        let currentTabType = 'all';
+        let unsubscribeGigs = null; // Used to detach listener on tab switch
+
+        // AUTH INITIALIZATION
+        async function checkAuth() {
+            try {
+                const user = await account.get();
+                activeUser = user;
+                
+                // Fetch User Profile from Profiles Collection
+                let displayName = "Student";
+                try {
+                    const userDoc = await db.getDocument(APPWRITE_DB_ID, APPWRITE_COL_PROFILES, activeUser.$id);
+                    if (userDoc && userDoc.firstName) {
+                        displayName = `${userDoc.firstName} ${userDoc.lastName || ''}`.trim() || userDoc.fullName || "Student";
+                    } else if (user.email) {
+                        displayName = user.email.split('@')[0];
+                    }
+                } catch (error) {
+                    console.error("Error retrieving user profile:", error);
+                    displayName = user.email ? user.email.split('@')[0] : "Student";
+                }
+
+                document.getElementById('userNameDisplay').innerText = displayName;
+                document.getElementById('userAvatar').innerText = displayName.charAt(0).toUpperCase();
+
+                // Initial fetch
+                fetchGigs('all');
+            } catch (error) {
+                console.error("Auth routing redirect:", error);
+                window.location.href = "login.html";
+            }
+        }
+
+        checkAuth();
+
+        // CORE TASK: fetchGigs(filterType) Logic using Appwrite database queries (PRIME STANDARD 3)
+        window.fetchGigs = async function(filterType) {
+            currentTabType = filterType;
+            
+            // UI Tab Update
+            document.getElementById('tabAll').classList.toggle('active', filterType === 'all');
+            document.getElementById('tabMine').classList.toggle('active', filterType === 'mine');
+
+            // Detach previous listener to prevent leaks
+            if (unsubscribeGigs) {
+                unsubscribeGigs();
+                unsubscribeGigs = null;
+            }
+
+            async function fetchAndRender() {
+                try {
+                    let queries = [
+                        Query.limit(100)
+                    ];
+
+                    // Apply filter for "My Gigs" tab (PRIME STANDARD 3)
+                    if (filterType === 'mine') {
+                        queries.push(Query.equal('authorUid', activeUser.$id));
+                    }
+
+                    const response = await db.listDocuments(
+                        APPWRITE_DB_ID,
+                        APPWRITE_COL_GIGS,
+                        queries
+                    );
+
+                    allGigs = response.documents;
+                    filterAndRenderUI();
+                } catch (error) {
+                    console.error("Error retrieving gigs:", error);
+                }
+            }
+
+            // Perform initial load
+            await fetchAndRender();
+
+            // Real-time listener registration
+            try {
+                unsubscribeGigs = client.subscribe(
+                    `databases.${APPWRITE_DB_ID}.collections.${APPWRITE_COL_GIGS}.documents`,
+                    (response) => {
+                        const events = response.events;
+                        if (events.some(e => e.includes('.create') || e.includes('.update') || e.includes('.delete'))) {
+                            fetchAndRender();
+                        }
+                    }
+                );
+            } catch (err) {
+                console.error("Realtime subscription failed:", err);
+            }
+        };
+
+        // Real-Time UI Filter Logic
+        window.filterAndRenderUI = function() {
+            const container = document.getElementById('gigsContainer');
+            const searchQuery = document.getElementById('gigSearch').value.toLowerCase();
+            const categoryValue = document.getElementById('categoryFilter').value;
+            const sortValue = document.getElementById('sortFilter').value;
+
+            let filtered = allGigs.filter(gig => {
+                const titleMatch = gig.title ? gig.title.toLowerCase().includes(searchQuery) : false;
+                const descMatch = gig.description ? gig.description.toLowerCase().includes(searchQuery) : false;
+                const matchesSearch = titleMatch || descMatch;
+                const matchesCategory = (categoryValue === 'all') || (gig.category === categoryValue);
+                
+                return matchesSearch && matchesCategory;
+            });
+
+            // Sorting logic (handling Appwrite dates/ISO values)
+            if (sortValue === 'newest') {
+                filtered.sort((a, b) => {
+                    const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+                    const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+                    return timeB - timeA;
+                });
+            } else if (sortValue === 'priceHigh') {
+                filtered.sort((a, b) => b.price - a.price);
+            } else if (sortValue === 'priceLow') {
+                filtered.sort((a, b) => a.price - b.price);
+            }
+
+            container.innerHTML = '';
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <h3>No services found</h3>
+                        <p>Try adjusting your search or filters.</p>
+                    </div>`;
+                return;
+            }
+
+            filtered.forEach(gig => {
+                const isMine = gig.authorUid === activeUser.$id;
+                const authorInitial = (gig.authorName || "S").charAt(0).toUpperCase();
+                const fallbackImg = "https://images.unsplash.com/photo-1516321497487-e288fb19713f?q=80&w=2070&auto=format&fit=crop";
+                
+                const card = document.createElement('div');
+                card.className = 'gig-card';
+                card.innerHTML = `
+                    <img src="${gig.imageUrl || fallbackImg}" alt="Gig Image" class="gig-image" onerror="this.src='${fallbackImg}'">
+                    <div class="gig-content">
+                        <div class="gig-author">
+                            <div class="author-avatar">${authorInitial}</div>
+                            <div class="author-info">
+                                <span>${gig.authorName || 'Student'}</span>
+                                <small>Verified Peer</small>
+                            </div>
+                        </div>
+                        <h3 class="gig-title">${gig.title}</h3>
+                        <p class="gig-desc">${gig.description}</p>
+                        <div class="gig-tags">
+                            <span class="tag">${gig.category}</span>
+                            <span class="tag-delivery">⏱ ${gig.deliveryTime || 'TBD'}</span>
+                        </div>
+                        <div class="gig-footer">
+                            <div class="gig-price">₹${gig.price}</div>
+                            <div class="card-actions">
+                                ${isMine ? `
+                                    <button class="btn-edit" onclick="editGig('${gig.$id}')">Edit</button>
+                                    <button class="btn-delete" onclick="deleteGig('${gig.$id}')">Delete</button>
+                                ` : `
+                                    <button class="btn-view" onclick="window.location.href='gig-details.html?id=${gig.$id}'">View Details</button>
+                                `}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        };
+
+        window.editGig = function(id) {
+            const gig = allGigs.find(g => g.$id === id);
+            if (!gig) return;
+            document.getElementById('modalTitle').innerText = "Edit Your Gig";
+            document.getElementById('submitBtn').innerText = "Update Gig";
+            document.getElementById('editGigId').value = id;
+            document.getElementById('modalGigTitle').value = gig.title;
+            document.getElementById('modalGigCategory').value = gig.category;
+            document.getElementById('modalGigPrice').value = gig.price;
+            document.getElementById('modalGigDelivery').value = gig.deliveryTime || '1 Week';
+            document.getElementById('editGigImageUrl').value = gig.imageUrl || ''; // Save old URL
+            document.getElementById('modalGigDesc').value = gig.description;
+            
+            // Show modal
+            document.getElementById('gigOverlay').style.display = 'block';
+            document.getElementById('gigModal').style.display = 'flex';
+        };
+
+        // CRUD OPERATIONS: POST / UPDATE using Appwrite Databases & Storage Sync (PRIME STANDARD 2)
+        document.getElementById('postGigForm').onsubmit = async (e) => {
+            e.preventDefault();
+            
+            if (!activeUser) {
+                alert("Session expired. Please log in again.");
+                window.location.href = 'login.html';
+                return;
+            }
+
+            const btnSubmit = document.getElementById('submitBtn');
+            btnSubmit.disabled = true;
+            btnSubmit.innerText = "Processing...";
+
+            try {
+                const gigId = document.getElementById('editGigId').value;
+                const currentUserName = document.getElementById('userNameDisplay').innerText;
+                const fileInput = document.getElementById('modalGigFile');
+                
+                let finalImageUrl = document.getElementById('editGigImageUrl').value; // Default to existing URL if editing
+                
+                // STORAGE UPLOAD LOGIC
+                if (fileInput.files.length > 0) {
+                    btnSubmit.innerText = "Uploading Image...";
+                    const file = fileInput.files[0];
+                    const uploadResponse = await storage.createFile(
+                        APPWRITE_BUCKET_ID,
+                        ID.unique(),
+                        file
+                    );
+                    finalImageUrl = storage.getFileView(APPWRITE_BUCKET_ID, uploadResponse.$id).href;
+                } else if (!finalImageUrl) {
+                    // Fallback placeholder if no image provided and no previous image exists
+                    finalImageUrl = "https://images.unsplash.com/photo-1516321497487-e288fb19713f?q=80&w=2070&auto=format&fit=crop";
+                }
+
+                btnSubmit.innerText = "Saving to Database...";
+
+                const gigData = {
+                    title: document.getElementById('modalGigTitle').value,
+                    category: document.getElementById('modalGigCategory').value,
+                    price: parseFloat(document.getElementById('modalGigPrice').value),
+                    deliveryTime: document.getElementById('modalGigDelivery').value,
+                    imageUrl: finalImageUrl,
+                    description: document.getElementById('modalGigDesc').value,
+                    authorUid: activeUser.$id, 
+                    authorName: currentUserName,      
+                    createdAt: new Date().toISOString()
+                };
+
+                if (gigId) {
+                    // Update existing Document
+                    await db.updateDocument(APPWRITE_DB_ID, APPWRITE_COL_GIGS, gigId, gigData);
+                } else {
+                    // Add new Document
+                    await db.createDocument(APPWRITE_DB_ID, APPWRITE_COL_GIGS, ID.unique(), gigData);
+                }
+                
+                closePostModal();
+            } catch (err) {
+                console.error("Appwrite Operational Error:", err);
+                alert("Operation Failed: " + err.message);
+            } finally {
+                btnSubmit.disabled = false;
+                const isEditing = document.getElementById('editGigId').value !== "";
+                btnSubmit.innerText = isEditing ? "Update Gig" : "Publish Gig";
+            }
+        };
+
+        // DELETE using Appwrite
+        window.deleteGig = async function(id) {
+            if (confirm("Permanently delete this gig?")) {
+                try {
+                    await db.deleteDocument(APPWRITE_DB_ID, APPWRITE_COL_GIGS, id);
+                } catch (err) {
+                    alert("Delete failed: " + err.message);
+                }
+            }
+        };
+
+        // LOGOUT LOGIC
+        document.getElementById('logoutBtn').onclick = async () => {
+            try {
+                await account.deleteSession('current');
+                window.location.href = 'login.html';
+            } catch (error) {
+                console.error("Logout verification failed:", error);
+            }
+        };
+
+    </script>
+    <script type="module" src="notifications.js"></script>
+</body>
+</html>
